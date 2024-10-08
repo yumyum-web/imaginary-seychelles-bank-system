@@ -1,12 +1,12 @@
-#!/usr/bin/env sh
+#!/bin/bash/env sh
 
 # Get the current branch name
 branch_name=$(git symbolic-ref --short HEAD)
 
-# Block commits to the main branch
+# Block rebases into the main branch
 if [ "$branch_name" = "main" ]; then
-  echo "Direct commits to 'main' are not allowed!"
+  echo "Rebasing into 'main' is not allowed!"
   exit 1
 fi
 
-pnpm lint-staged
+exit 0

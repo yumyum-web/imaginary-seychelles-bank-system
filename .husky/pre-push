@@ -1,0 +1,13 @@
+#!/bin/bash/env sh
+
+# Get the current branch name
+branch_name=$(git symbolic-ref --short HEAD)
+
+# Block pushes to the main branch.
+# This might be redundant.
+if [ "$branch_name" = "main" ]; then
+  echo "Direct pushes from 'main' are not allowed!"
+  exit 1
+fi
+
+exit 0
