@@ -1,0 +1,27 @@
+{
+  "name": "imaginary-seychelles-bank-system",
+  "version": "1.0.0",
+  "description": "Web system for the Imaginary Seychelles Bank",
+  "scripts": {
+    "prepare": "husky",
+    "test": "pnpm -r test"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "GPL-3.0",
+  "devDependencies": {
+    "husky": "^9.1.6",
+    "lint-staged": "^15.2.10",
+    "prettier": "^3.3.3"
+  },
+  "packageManager": "pnpm@9.11.0",
+  "lint-staged": {
+    "*.md": "prettier --write"
+  },
+  "engines": {
+    "node": ">=22.9.0",
+    "pnpm": ">=9.11.0",
+    "npm": "please-use-pnpm",
+    "yarn": "please-use-pnpm"
+  }
+}

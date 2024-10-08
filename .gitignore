@@ -1,0 +1,29 @@
+# node_modules directory
+node_modules/
+
+# log files
+*.log
+
+# build directories
+dist/
+build/
+
+# environment variable files
+.env
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# IDE specific files
+.vscode/
+.idea/
+
+# compiled files
+*.out
+*.class
+*.o
+*.so
+
+# Ignore coverage reports
+coverage/
