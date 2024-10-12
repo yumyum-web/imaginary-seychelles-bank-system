@@ -71,12 +71,6 @@ VALUES
 (5, 'F555555555', 2, 'Branch Manager', '2020-01-01 09:00:00', NULL),  -- Employee
 (6, 'F558559815', 2, 'Loan Officer', '2020-01-01 09:00:00', NULL);  
 
-INSERT INTO Manager (Manager_id, Employee_id)
-VALUES
-(1, 2),
-(2, 5),
-(3, 3);
-
 -- Activity Data
 INSERT INTO Activity (Activity_id, Type, Amount, Date)
 VALUES
@@ -88,9 +82,9 @@ VALUES
 
 INSERT INTO Loan_Request (Request_id, Loan_type, Acc_id, Amount, Purpose, Employee_id, Manager_id, Status)
 VALUES
-(1, 'Business', 101, 50000.00, 'Business Expansion', 1, 1, 'Accepted'),
+(1, 'Business', 101, 50000.00, 'Business Expansion', 1, 2, 'Accepted'),
 (2, 'Personal', 103, 20000.00, 'Home Renovation', 4, 3, 'Accepted'),
-(3, 'Personal', 105, 15000.00, 'Car Purchase', 6, 2, 'Accepted');
+(3, 'Personal', 105, 15000.00, 'Car Purchase', 6, 5, 'Accepted');
 
 
 INSERT INTO Loan (Loan_id, Type, Amount, Interest_rate, Purpose, Request_id, Customer_id, Acc_id, Activity_id)

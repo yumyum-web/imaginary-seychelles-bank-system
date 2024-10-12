@@ -74,13 +74,6 @@ CREATE TABLE Employee (
     FOREIGN KEY (Branch_id) REFERENCES Branch(Branch_id)
 );
 
--- Manager table
-CREATE TABLE Manager (
-    Manager_id INT PRIMARY KEY,
-    Employee_id INT,
-    FOREIGN KEY (Employee_id) REFERENCES Employee(Employee_id)
-);
-
 -- Activity table
 CREATE TABLE Activity (
     Activity_id INT PRIMARY KEY,
@@ -101,7 +94,7 @@ CREATE TABLE Loan_Request (
     Status ENUM('Pending', 'Accepted', 'Rejected'),
     FOREIGN KEY (Acc_id) REFERENCES Account(Acc_id),
     FOREIGN KEY (Employee_id) REFERENCES Employee(Employee_id),
-    FOREIGN KEY (Manager_id) REFERENCES Manager(Manager_id)
+    FOREIGN KEY (Manager_id) REFERENCES Employee(Employee_id)
 );
 
 -- Loan table
