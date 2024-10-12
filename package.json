@@ -10,12 +10,16 @@
   "author": "",
   "license": "GPL-3.0",
   "devDependencies": {
+    "@eslint/js": "^9.12.0",
+    "eslint": "^9.12.0",
+    "globals": "^15.11.0",
     "husky": "^9.1.6",
     "lint-staged": "^15.2.10",
     "prettier": "^3.3.3"
   },
   "packageManager": "pnpm@9.11.0",
   "lint-staged": {
+    "*.js": "eslint --fix",
     "*.{js,md}": "prettier --write"
   },
   "engines": {
@@ -23,5 +27,6 @@
     "pnpm": ">=9.11.0",
     "npm": "please-use-pnpm",
     "yarn": "please-use-pnpm"
-  }
+  },
+  "type": "module"
 }
