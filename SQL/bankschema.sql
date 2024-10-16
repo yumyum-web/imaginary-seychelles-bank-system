@@ -55,7 +55,7 @@ CREATE TABLE SA_plan (
   SA_plan_id INT PRIMARY KEY,
   Name VARCHAR(30),
   Interest_rate DECIMAL(4, 3) CHECK (Interest_rate BETWEEN 0 AND 1),
-  Min_balance DECIMAL(10, 2) CHECK (Min_balance > 0.00)
+  Min_balance DECIMAL(10, 2) CHECK (Min_balance >= 0.00)
 );
 
 -- Savings_Account table
@@ -102,6 +102,7 @@ CREATE TABLE Loan_Request (
   Purpose VARCHAR(300),
   Employee_id INT,
   Manager_id INT,
+  Time_Period INT,
   Status ENUM('Pending', 'Accepted', 'Rejected'),
   FOREIGN KEY (Acc_id) REFERENCES Account (Acc_id),
   FOREIGN KEY (Employee_id) REFERENCES Employee (Employee_id),
@@ -119,6 +120,8 @@ CREATE TABLE Loan (
   Customer_id INT,
   Acc_id INT,
   Activity_id INT,
+  StartDate DATE,
+  EndDate DATE,
   FOREIGN KEY (Request_id) REFERENCES Loan_Request (Request_id),
   FOREIGN KEY (Customer_id) REFERENCES Customer (Customer_id),
   FOREIGN KEY (Activity_id) REFERENCES Activity (Activity_id),
