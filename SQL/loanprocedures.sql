@@ -40,9 +40,15 @@ CREATE PROCEDURE Create_Loan (
   IN p_start_date DATE,
   IN p_end_date DATE,
   IN p_request_id INT
-) BEGIN DECLARE activity_id INT;
+) BEGIN DECLARE v_activity_id INT;
 
-DECLARE new_loan_id INT;
+INSERT INTO
+  Activity (Type, Amount, DATE)
+VALUES
+  ('Loan Deposit', p_loan_amount, NOW());
+
+SELECT
+  LAST_INSERT_ID() INTO v_activity_id;
 
 -- Insert the loan into the Loan table
 INSERT INTO
@@ -67,29 +73,12 @@ VALUES
     p_request_id,
     p_customer_id,
     p_account_id,
-    NULL,
+    v_activity_id,
     p_start_date,
     p_end_date
   );
 
-SELECT
-  LAST_INSERT_ID() INTO new_loan_id;
-
-INSERT INTO
-  Activity (Type, Amount, DATE)
-VALUES
-  ('Loan Deposit', p_loan_amount, NOW());
-
-SELECT
-  LAST_INSERT_ID() AS activity_id;
-
-UPDATE Loan
-SET
-  Activity_id = activity_id
-WHERE
-  Loan_id = new_loan_id;
-
-CALL Deposit (p_account_id, p_loan_amount, activity_id);
+CALL Deposit (p_account_id, p_loan_amount, v_activity_id);
 
 -- Indicate successful creation
 SELECT
