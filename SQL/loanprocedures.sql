@@ -243,7 +243,7 @@ COMMIT;
 
 END;
 
---function to calculate the maximum loan amount for self apply loans(online)
+-- function to calculate the maximum loan amount for self apply loans(online)
 CREATE FUNCTION Max_amount_Self_Apply_Loan (p_customer_id INT) RETURNS DECIMAL(10, 2) DETERMINISTIC READS SQL DATA BEGIN DECLARE max_loan_amount DECIMAL(10, 2);
 
 DECLARE fd_balance DECIMAL(10, 2);
