@@ -20,15 +20,14 @@ VALUES
 END;
 
 -- Max_Withdraw_Amount Function: Returns the maximum amount that can be withdrawn from an account, null if there is no limit.
-CREATE FUNCTION Max_Withdraw_Amount (Acc_id INT) RETURNS DECIMAL(10, 2) BEGIN;
-
-DECLARE Aax_amount DECIMAL(10, 2);
+CREATE FUNCTION Max_Withdraw_Amount (Acc_id INT) RETURNS DECIMAL(10, 2) BEGIN DECLARE Max_amount DECIMAL(10, 2);
 
 DECLARE Acc_type ENUM('Savings', 'Checking');
 
 DECLARE Acc_balance DECIMAL(10, 2);
 
-DECLARE Min_balance
+DECLARE Min_balance DECIMAL(10, 2);
+
 SELECT
   Type,
   Balance INTO Acc_type,
@@ -36,7 +35,7 @@ SELECT
 FROM
   Account
 WHERE
-  Acc_id = Acc_id;
+  Account.Acc_id = Acc_id;
 
 IF Acc_type = 'Savings' THEN
 SELECT
@@ -50,7 +49,7 @@ WHERE
     FROM
       Savings_Account
     WHERE
-      Acc_id = Acc_id
+      Savings_Account.Acc_id = Acc_id
   );
 
 IF Acc_balance > Min_balance THEN
@@ -80,7 +79,7 @@ FROM
 WHERE
   Acc_id = Acc_id;
 
-IF No_of_withdrawals = NULL THEN
+IF No_of_withdrawals IS NULL THEN
 RETURN NULL;
 
 ELSE
@@ -124,7 +123,7 @@ UPDATE Account
 SET
   Balance = Balance - Amount
 WHERE
-  Acc_id = Acc_id;
+  Account.Acc_id = Acc_id;
 
 INSERT INTO
   Transaction (Acc_id, Activity_id, Type)
