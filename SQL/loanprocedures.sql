@@ -126,7 +126,6 @@ SELECT
   Status,
   Amount,
   Acc_id,
-  Customer_id,
   Loan_type,
   Purpose,
   Time_period INTO requestStatus,
