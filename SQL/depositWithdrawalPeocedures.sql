@@ -89,3 +89,46 @@ RETURN 5 - No_of_withdrawals;
 END IF;
 
 END;
+
+-- Withdraw Procedure: Withdraws money from an account.
+CREATE PROCEDURE Withdraw (
+  IN Acc_id INT,
+  IN Activity_id INT,
+  IN Amount DECIMAL(10, 2) CHECK (Amount > 0.00),
+  IN Type ENUM('Online Transfer', 'Loan Installment')
+) BEGIN;
+
+DECLARE Max_amount DECIMAL(10, 2);
+
+DECLARE Available_withdrawals INT;
+
+SET
+  Max_amount = Max_Withdraw_Amount (Acc_id);
+
+SET
+  Available_withdrawals = Available_Withdrawals (Acc_id);
+
+IF Amount > Max_amount THEN SIGNAL SQLSTATE '45000'
+SET
+  MESSAGE_TEXT = 'Amount exceeds the maximum withdrawal limit.';
+
+END IF;
+
+IF Available_withdrawals = 0 THEN SIGNAL SQLSTATE '45000'
+SET
+  MESSAGE_TEXT = 'No more withdrawals allowed.';
+
+END IF;
+
+UPDATE Account
+SET
+  Balance = Balance - Amount
+WHERE
+  Acc_id = Acc_id;
+
+INSERT INTO
+  Transaction (Acc_id, Activity_id, Type)
+VALUES
+  (Acc_id, Activity_id, 'Withdrawal');
+
+END;
