@@ -1,9 +1,8 @@
 CREATE PROCEDURE Create_Loan_Request (
   IN employeeId INT,
-  IN customerId INT,
   IN loanType ENUM('Business', 'Personal'),
   IN loanAmount DECIMAL(10, 2),
-  IN purpose VARCHAR(300),
+  IN l_purpose VARCHAR(300),
   IN accountId INT,
   IN timePeriod INT
 ) BEGIN
@@ -16,7 +15,6 @@ INSERT INTO
     Purpose,
     Employee_id,
     Status,
-    Customer_id,
     Time_period
   )
 VALUES
@@ -24,10 +22,9 @@ VALUES
     loanType,
     accountId,
     loanAmount,
-    purpose,
+    l_purpose,
     employeeId,
     'Pending',
-    customerId,
     timePeriod
   );
 
