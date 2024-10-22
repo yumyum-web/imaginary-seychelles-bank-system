@@ -18,3 +18,52 @@ VALUES
   (Type, Amount, NOW());
 
 END;
+
+-- Max_Withdraw_Amount Function: Returns the maximum amount that can be withdrawn from an account, null if there is no limit.
+CREATE FUNCTION Max_Withdraw_Amount (Acc_id INT) RETURNS DECIMAL(10, 2) BEGIN;
+
+DECLARE Aax_amount DECIMAL(10, 2);
+
+DECLARE Acc_type ENUM('Savings', 'Checking');
+
+DECLARE Acc_balance DECIMAL(10, 2);
+
+DECLARE Min_balance
+SELECT
+  Type,
+  Balance INTO Acc_type,
+  Acc_balance
+FROM
+  Account
+WHERE
+  Acc_id = Acc_id;
+
+IF Acc_type = 'Savings' THEN
+SELECT
+  Min_balance INTO Min_balance
+FROM
+  SA_plan
+WHERE
+  SA_plan_id = (
+    SELECT
+      SA_plan_id
+    FROM
+      Savings_Account
+    WHERE
+      Acc_id = Acc_id
+  );
+
+IF Acc_balance > Min_balance THEN
+RETURN Acc_balance - Min_balance;
+
+ELSE
+RETURN 0.00;
+
+END IF;
+
+ELSE
+RETURN Acc_balance;
+
+END IF;
+
+END;
