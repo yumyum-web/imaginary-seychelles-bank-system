@@ -35,10 +35,12 @@ DELIMITER ;
 DELIMITER //
 CREATE PROCEDURE Organization_Registration(
     IN p_OrgName VARCHAR(100),
+    IN p_Type VARCHAR(100),
     IN p_Username VARCHAR(25),
     IN p_Password VARCHAR(25),
     IN p_Address VARCHAR(200),
-    IN p_ContactNumber INT
+    IN p_ContactNumber INT,
+    IN p_Date_of_incorp DATETIME
 )
 BEGIN
     -- Insert into Login table
@@ -56,8 +58,8 @@ BEGIN
     SET @customer_id = LAST_INSERT_ID();
 
     -- Insert into Organization table
-    INSERT INTO Organization (Org_name, Address, Contact_number, Login_id, Customer_id)
-    VALUES (p_OrgName, p_Address, p_ContactNumber, @login_id, @customer_id);
+    INSERT INTO Organization (Organization_name,Type, Address, Phone_number, Date_of_incorporation,Login_id, Customer_id)
+    VALUES (p_OrgName, p_Type,p_Address, p_ContactNumber,p_Date_of_incorp, @login_id, @customer_id);
 END;
 //
 DELIMITER ;
