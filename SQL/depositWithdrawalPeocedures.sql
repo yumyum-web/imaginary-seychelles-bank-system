@@ -1,5 +1,9 @@
 -- Deposit procedure
-CREATE PROCEDURE Deposit (IN Acc_id INT, IN Activity_id INT,) BEGIN;
+CREATE PROCEDURE Deposit (
+  IN Acc_id INT,
+  IN Amount DECIMAL(10, 2) CHECK (Amount > 0),
+  IN Activity_id INT,
+) BEGIN;
 
 UPDATE
 TABLE Account
