@@ -1,28 +1,25 @@
 -- Deposit procedure
 CREATE PROCEDURE Deposit (
-  IN Acc_id INT,
-  IN Amount DECIMAL(10, 2) CHECK (Amount > 0),
-  IN Activity_id INT,
+  IN D_acc_id INT,
+  IN D_amount DECIMAL(10, 2),
+  IN D_activity_id INT
 ) BEGIN;
 
-UPDATE
-TABLE Account
+UPDATE Account
 SET
-  Balance = Balance + Amount
+  Balance = Balance + D_amount
 WHERE
-  Acc_id = Acc_id;
+  Account.Acc_id = D_acc_id;
 
 INSERT INTO
   Transaction (Acc_id, Activity_id, Type)
 VALUES
-  (Acc_id, Activity_id, 'Deposit');
+  (D_acc_id, D_activity_id, 'Deposit');
 
 END;
 
 -- Max_Withdraw_Amount Function: Returns the maximum amount that can be withdrawn from an account, null if there is no limit.
-CREATE FUNCTION Max_Withdraw_Amount (Acc_id INT) RETURNS DECIMAL(10, 2) BEGIN DECLARE Max_amount DECIMAL(10, 2);
-
-DECLARE Acc_type ENUM('Savings', 'Checking');
+CREATE FUNCTION Max_Withdraw_Amount (Acc_id INT) RETURNS DECIMAL(10, 2) BEGIN DECLARE Acc_type ENUM('Savings', 'Checking');
 
 DECLARE Acc_balance DECIMAL(10, 2);
 
@@ -77,7 +74,7 @@ SELECT
 FROM
   Savings_Account
 WHERE
-  Acc_id = Acc_id;
+  Savings_Account.Acc_id = Acc_id;
 
 IF No_of_withdrawals IS NULL THEN
 RETURN NULL;
@@ -91,10 +88,9 @@ END;
 
 -- Withdraw Procedure: Withdraws money from an account.
 CREATE PROCEDURE Withdraw (
-  IN Acc_id INT,
-  IN Activity_id INT,
-  IN Amount DECIMAL(10, 2) CHECK (Amount > 0.00),
-  IN Type ENUM('Online Transfer', 'Loan Installment')
+  IN W_acc_id INT,
+  IN W_activity_id INT,
+  IN W_amount DECIMAL(10, 2)
 ) BEGIN;
 
 DECLARE Max_amount DECIMAL(10, 2);
@@ -102,12 +98,12 @@ DECLARE Max_amount DECIMAL(10, 2);
 DECLARE Available_withdrawals INT;
 
 SET
-  Max_amount = Max_Withdraw_Amount (Acc_id);
+  Max_amount = Max_Withdraw_Amount (W_acc_id);
 
 SET
-  Available_withdrawals = Available_Withdrawals (Acc_id);
+  Available_withdrawals = Available_Withdrawals (W_acc_id);
 
-IF Amount > Max_amount THEN SIGNAL SQLSTATE '45000'
+IF W_amount > Max_amount THEN SIGNAL SQLSTATE '45000'
 SET
   MESSAGE_TEXT = 'Amount exceeds the maximum withdrawal limit.';
 
@@ -121,13 +117,13 @@ END IF;
 
 UPDATE Account
 SET
-  Balance = Balance - Amount
+  Balance = Balance - W_amount
 WHERE
-  Account.Acc_id = Acc_id;
+  Account.Acc_id = W_acc_id;
 
 INSERT INTO
   Transaction (Acc_id, Activity_id, Type)
 VALUES
-  (Acc_id, Activity_id, 'Withdrawal');
+  (W_acc_id, W_activity_id, 'Withdrawal');
 
 END;

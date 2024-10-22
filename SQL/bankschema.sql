@@ -1,13 +1,8 @@
-----------------------------------------
---                                    --
---             Tables                 --
---                                    --
-----------------------------------------
 -- Branch table
 CREATE TABLE Branch (
   Branch_id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
   Name VARCHAR(100) NOT NULL,
-  Address VARCHAR(300) NOT NULL,
+  Address VARCHAR(300) NOT NULL
 );
 
 -- Customer table
@@ -44,7 +39,7 @@ CREATE TABLE Account (
   Branch_id INT NOT NULL,
   Customer_id INT NOT NULL,
   Type ENUM('Savings', 'Checking') NOT NULL,
-  Balance DECIMAL(10, 2) CHECK (Balance > 0.00) NOT NULL,
+  Balance DECIMAL(10, 2) CHECK (Balance > 0.00),
   Opened_date DATETIME NOT NULL,
   FOREIGN KEY (Branch_id) REFERENCES Branch (Branch_id),
   FOREIGN KEY (Customer_id) REFERENCES Customer (Customer_id)
@@ -54,8 +49,8 @@ CREATE TABLE Account (
 CREATE TABLE SA_plan (
   SA_plan_id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
   Name VARCHAR(30) NOT NULL,
-  Interest_rate DECIMAL(4, 3) CHECK (Interest_rate BETWEEN 0 AND 1) NOT NULL,
-  Min_balance DECIMAL(10, 2) CHECK (Min_balance >= 0.00) NOT NULL
+  Interest_rate DECIMAL(4, 3) CHECK (Interest_rate BETWEEN 0 AND 1),
+  Min_balance DECIMAL(10, 2) CHECK (Min_balance >= 0.00)
 );
 
 -- Savings_Account table
@@ -63,7 +58,7 @@ CREATE TABLE Savings_Account (
   Savings_acc_id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
   Acc_id INT NOT NULL,
   SA_plan_id INT NOT NULL,
-  No_of_withdrawals INT CHECK (No_of_withdrawals >= 0) NOT NULL,
+  No_of_withdrawals INT CHECK (No_of_withdrawals >= 0),
   FOREIGN KEY (Acc_id) REFERENCES Account (Acc_id),
   FOREIGN KEY (SA_plan_id) REFERENCES SA_plan (SA_plan_id)
 );
@@ -89,7 +84,7 @@ CREATE TABLE Activity (
     'Loan Installment',
     'Interest'
   ) NOT NULL,
-  Amount DECIMAL(10, 2) CHECK (Amount > 0.00) NOT NULL,
+  Amount DECIMAL(10, 2) CHECK (Amount > 0.00),
   DATE DATETIME NOT NULL
 );
 
@@ -98,7 +93,7 @@ CREATE TABLE Loan_Request (
   Request_id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
   Loan_type ENUM('Business', 'Personal') NOT NULL,
   Acc_id INT NOT NULL,
-  Amount DECIMAL(10, 2) CHECK (Amount > 0.00) NOT NULL,
+  Amount DECIMAL(10, 2) CHECK (Amount > 0.00),
   Purpose VARCHAR(300) NOT NULL,
   Employee_id INT NOT NULL,
   Manager_id INT,
@@ -113,8 +108,8 @@ CREATE TABLE Loan_Request (
 CREATE TABLE Loan (
   Loan_id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
   Type ENUM('Business', 'Personal') NOT NULL,
-  Amount DECIMAL(10, 2) CHECK (Amount > 0.00) NOT NULL,
-  Interest_rate DECIMAL(4, 3) CHECK (Interest_rate BETWEEN 0 AND 1) NOT NULL,
+  Amount DECIMAL(10, 2) CHECK (Amount > 0.00),
+  Interest_rate DECIMAL(4, 3) CHECK (Interest_rate BETWEEN 0 AND 1),
   Purpose VARCHAR(300) NOT NULL,
   Request_id INT,
   Customer_id INT NOT NULL,
@@ -131,8 +126,8 @@ CREATE TABLE Loan (
 -- FD_plan table
 CREATE TABLE FD_plan (
   FD_plan_id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
-  Duration INT CHECK (Duration > 0) NOT NULL,
-  Interest_rate DECIMAL(4, 3) CHECK (Interest_rate BETWEEN 0 AND 1) NOT NULL
+  Duration INT CHECK (Duration > 0),
+  Interest_rate DECIMAL(4, 3) CHECK (Interest_rate BETWEEN 0 AND 1)
 );
 
 -- Fixed_deposit table
@@ -140,7 +135,7 @@ CREATE TABLE Fixed_deposit (
   FD_id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
   Branch_id INT NOT NULL,
   Customer_id INT NOT NULL,
-  Balance DECIMAL(10, 2) CHECK (Balance > 0.00) NOT NULL,
+  Balance DECIMAL(10, 2) CHECK (Balance > 0.00),
   Savings_acc_id INT NOT NULL,
   Opened_date DATETIME NOT NULL,
   FD_plan_id INT NOT NULL,
@@ -164,7 +159,7 @@ CREATE TABLE Transaction (
 CREATE TABLE Loan_Installments (
   Loan_id INT NOT NULL,
   DATE DATETIME NOT NULL,
-  Amount DECIMAL(10, 2) CHECK (Amount >= 0.00) NOT NULL,
+  Amount DECIMAL(10, 2) CHECK (Amount >= 0.00),
   Activity_id INT,
   FOREIGN KEY (Loan_id) REFERENCES Loan (Loan_id),
   FOREIGN KEY (Activity_id) REFERENCES Activity (Activity_id)
@@ -183,29 +178,3 @@ CREATE TABLE Organization (
   FOREIGN KEY (Login_id) REFERENCES Login (Login_id),
   FOREIGN KEY (Customer_id) REFERENCES Customer (Customer_id)
 );
-
-----------------------------------------
---                                    --
---             Indexes                --
---                                    --
-----------------------------------------
-----------------------------------------
---                                    --
---             Triggers               --
---                                    --
-----------------------------------------
-----------------------------------------
---                                    --
---               Views                --
---                                    --
-----------------------------------------
-----------------------------------------
---                                    --
---              Functions             --
---                                    --
-----------------------------------------
-----------------------------------------
---                                    --
---             Procedures             --
---                                    --
-----------------------------------------
