@@ -1,9 +1,5 @@
 -- Deposit procedure
-CREATE PROCEDURE Deposit (
-  IN Acc_id INT,
-  IN Amount DECIMAL(10, 2) CHECK (Amount > 0.00),
-  IN Type ENUM('Online Transfer', 'Loan Deposit')
-) BEGIN;
+CREATE PROCEDURE Deposit (IN Acc_id INT, IN Activity_id INT,) BEGIN;
 
 UPDATE
 TABLE Account
@@ -13,8 +9,8 @@ WHERE
   Acc_id = Acc_id;
 
 INSERT INTO
-  Activity (Type, Amount, DATE)
+  Transaction (Acc_id, Activity_id, Type)
 VALUES
-  (Type, Amount, NOW());
+  (Acc_id, Activity_id, 'Deposit');
 
 END;
