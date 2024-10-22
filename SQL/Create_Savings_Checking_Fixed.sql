@@ -1,4 +1,3 @@
-DELIMITER / /
 CREATE PROCEDURE Create_Savings_Account (
   IN p_CustomerId INT,
   IN p_BranchId INT,
@@ -35,9 +34,6 @@ VALUES
 
 END;
 
-/ / DELIMITER;
-
-DELIMITER / /
 CREATE PROCEDURE Create_Checking_Account (
   IN p_CustomerId INT,
   IN p_BranchId INT,
@@ -63,9 +59,6 @@ VALUES
 
 END;
 
-/ / DELIMITER;
-
-DELIMITER / /
 CREATE PROCEDURE Create_Fixed_Deposit (
   IN p_CustomerId INT,
   IN p_BranchId INT,
@@ -114,4 +107,4 @@ VALUES
 
 END IF;
 
-END / / DELIMITER;
+END;
