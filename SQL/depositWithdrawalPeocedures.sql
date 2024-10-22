@@ -67,3 +67,25 @@ RETURN Acc_balance;
 END IF;
 
 END;
+
+-- Available_Withdrawals: Returns the number of withdrawals that can be made from an account.
+CREATE FUNCTION Available_Withdrawals (Acc_id INT) RETURNS INT BEGIN;
+
+DECLARE No_of_withdrawals INT;
+
+SELECT
+  No_of_withdrawals INTO No_of_withdrawals
+FROM
+  Savings_Account
+WHERE
+  Acc_id = Acc_id;
+
+IF No_of_withdrawals = NULL THEN
+RETURN NULL;
+
+ELSE
+RETURN 5 - No_of_withdrawals;
+
+END IF;
+
+END;
