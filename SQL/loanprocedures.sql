@@ -1,4 +1,3 @@
-DELIMITER $$
 CREATE PROCEDURE Create_Loan_Request (
   IN employeeId INT,
   IN customerId INT,
@@ -6,19 +5,11 @@ CREATE PROCEDURE Create_Loan_Request (
   IN loanAmount DECIMAL(10, 2),
   IN purpose VARCHAR(300),
   IN accountId INT,
-  IN timePeriod INT -- Added time period
-) BEGIN DECLARE newRequestId INT;
-
--- Manually generate the new RequestID
-SELECT
-  IFNULL(MAX(Request_id), 0) + 1 INTO newRequestId
-FROM
-  Loan_Request;
-
+  IN timePeriod INT
+) BEGIN
 -- Insert loan request into Loan_Request table
 INSERT INTO
   Loan_Request (
-    Request_id,
     Loan_type,
     Acc_id,
     Amount,
@@ -30,7 +21,6 @@ INSERT INTO
   )
 VALUES
   (
-    newRequestId,
     loanType,
     accountId,
     loanAmount,
@@ -41,14 +31,80 @@ VALUES
     timePeriod
   );
 
--- Insert time_period
-END $$ DELIMITER;
+END;
 
---create_loan
-DELIMITER $$
-CREATE PROCEDURE Create_Loan (IN requestId INT) BEGIN DECLARE newloanID INT;
+CREATE PROCEDURE Create_Loan (
+  IN p_loan_type ENUM('Business', 'Personal'),
+  IN p_loan_amount DECIMAL(10, 2),
+  IN p_interest_rate DECIMAL(5, 3),
+  IN p_purpose VARCHAR(300),
+  IN p_customer_id INT,
+  IN p_account_id INT,
+  IN p_start_date DATE,
+  IN p_end_date DATE,
+  IN p_request_id INT
+) BEGIN DECLARE activity_id INT;
 
-DECLARE requestStatus ENUM('Pending', 'Accepted', 'Rejected');
+DECLARE new_loan_id INT;
+
+-- Insert the loan into the Loan table
+INSERT INTO
+  Loan (
+    Type,
+    Amount,
+    Interest_rate,
+    Purpose,
+    Request_id,
+    Customer_id,
+    Acc_id,
+    Activity_id,
+    StartDate,
+    EndDate
+  )
+VALUES
+  (
+    p_loan_type,
+    p_loan_amount,
+    p_interest_rate,
+    p_purpose,
+    p_request_id,
+    p_customer_id,
+    p_account_id,
+    NULL,
+    p_start_date,
+    p_end_date
+  );
+
+SELECT
+  LAST_INSERT_ID() INTO new_loan_id;
+
+INSERT INTO
+  Activity (Type, Amount, DATE)
+VALUES
+  ('Loan Deposit', p_loan_amount, NOW());
+
+SELECT
+  LAST_INSERT_ID() AS activity_id;
+
+UPDATE Loan
+SET
+  Activity_id = activity_id
+WHERE
+  Loan_id = new_loan_id;
+
+CALL Deposit (p_account_id, p_loan_amount, activity_id);
+
+-- Indicate successful creation
+SELECT
+  'Loan created successfully.' AS Message;
+
+END;
+
+CREATE PROCEDURE Accept_Loan_Request (
+  IN managerId INT,
+  IN requestId INT,
+  IN action ENUM('Accept', 'Reject')
+) BEGIN DECLARE requestStatus ENUM('Pending', 'Accepted', 'Rejected');
 
 DECLARE loanAmount DECIMAL(10, 2);
 
@@ -60,17 +116,15 @@ DECLARE loanType ENUM('Business', 'Personal');
 
 DECLARE loanPurpose VARCHAR(100);
 
-DECLARE activityId INT;
-
 DECLARE timePeriod INT;
+
+DECLARE interestRate DECIMAL(5, 3);
 
 DECLARE startDate DATE;
 
 DECLARE endDate DATE;
 
-DECLARE interestRate DECIMAL(5, 3);
-
--- the interestRate variable
+-- Error handling
 DECLARE EXIT
 HANDLER FOR SQLEXCEPTION BEGIN
 ROLLBACK;
@@ -81,13 +135,7 @@ END;
 
 START TRANSACTION;
 
--- Manually generate the new LoanID
-SELECT
-  IFNULL(MAX(Loan_id), 0) + 1 INTO newloanID
-FROM
-  Loan;
-
--- Check if the loan request exists and retrieve details
+-- Check if the loan request exists and its status
 SELECT
   Status,
   Amount,
@@ -113,18 +161,36 @@ SET
 
 END IF;
 
--- Check if the request is still pending or rejected
-IF requestStatus = 'Pending' THEN SIGNAL SQLSTATE '45000'
+IF requestStatus != 'Pending' THEN SIGNAL SQLSTATE '45000'
 SET
-  MESSAGE_TEXT = 'Loan request is still pending approval.';
+  MESSAGE_TEXT = 'Loan request has already been processed.';
 
 END IF;
 
-IF requestStatus = 'Rejected' THEN SIGNAL SQLSTATE '45000'
+-- Validate manager exists
+IF NOT EXISTS (
+  SELECT
+    1
+  FROM
+    Employee
+  WHERE
+    Employee_id = managerId
+    AND POSITION = 'Branch Manager'
+) THEN SIGNAL SQLSTATE '45000'
 SET
-  MESSAGE_TEXT = 'Loan request has been rejected.';
+  MESSAGE_TEXT = 'Invalid manager ID.';
 
 END IF;
+
+-- Process the loan request
+IF action = 'Accept' THEN
+-- Update loan request to 'Accepted' and assign the manager
+UPDATE Loan_Request
+SET
+  Status = 'Accepted',
+  Manager_id = managerId
+WHERE
+  Request_id = requestId;
 
 -- Interest rate calculation logic based on loan type, amount, and time period
 IF loanType = 'Business' THEN IF loanAmount > 50000 THEN
@@ -153,111 +219,25 @@ END IF;
 
 END IF;
 
--- Calculate loan startDate (today) and endDate (add timePeriod months)
+-- Calculate loan startDate (today) and endDate (based on time period)
 SET
   startDate = CURDATE();
 
 SET
   endDate = DATE_ADD(CURDATE(), INTERVAL timePeriod MONTH);
 
--- Insert the loan into the Loan table
-INSERT INTO
-  Loan (
-    Loan_id,
-    Type,
-    Amount,
-    Interest_rate,
-    Purpose,
-    Request_id,
-    Customer_id,
-    Acc_id,
-    Activity_id,
-    StartDate,
-    EndDate
-  )
-VALUES
-  (
-    newloanID,
-    loanType,
-    loanAmount,
-    interestRate,
-    loanPurpose,
-    requestId,
-    customerId,
-    accountId,
-    NULL,
-    startDate,
-    endDate
-  );
-
--- Insert calculated interestRate
-COMMIT;
-
-END $$ DELIMITER;
-
--- Accept or reject loan request
-DELIMITER $$
-CREATE PROCEDURE Accept_Loan_Request (
-  IN managerId INT,
-  IN requestId INT,
-  IN action ENUM('Accept', 'Reject')
-) BEGIN DECLARE requestStatus ENUM('Pending', 'Accepted', 'Rejected');
-
-DECLARE EXIT
-HANDLER FOR SQLEXCEPTION BEGIN
-ROLLBACK;
-
-RESIGNAL;
-
-END;
-
-START TRANSACTION;
-
--- Check if the loan request exists and its status
-SELECT
-  Status INTO requestStatus
-FROM
-  Loan_Request
-WHERE
-  Request_id = requestId;
-
-IF requestStatus IS NULL THEN SIGNAL SQLSTATE '45000'
-SET
-  MESSAGE_TEXT = 'Loan request not found.';
-
-END IF;
-
--- Check if the request is still pending
-IF requestStatus != 'Pending' THEN SIGNAL SQLSTATE '45000'
-SET
-  MESSAGE_TEXT = 'Loan request has already been processed.';
-
-END IF;
-
--- Validate manager exists
-IF NOT EXISTS (
-  SELECT
-    1
-  FROM
-    Employee
-  WHERE
-    Employee_id = managerId
-    AND POSITION = 'Manager'
-) THEN SIGNAL SQLSTATE '45000'
-SET
-  MESSAGE_TEXT = 'Invalid manager ID.';
-
-END IF;
-
--- Process the loan request
-IF action = 'Accept' THEN
--- Update loan request to 'Accepted' and assign the manager
-UPDATE Loan_Request
-SET
-  Status = 'Accepted',
-  Manager_id = managerId
-WHERE
-  Request_id = requestId;
+-- Call Create_Loan procedure
+CALL Create_Loan (
+  loanType,
+  loanAmount,
+  interestRate,
+  loanPurpose,
+  customerId,
+  accountId,
+  startDate,
+  endDate,
+  requestId
+);
 
 ELSEIF action = 'Reject' THEN
 -- Update loan request to 'Rejected' and assign the manager
@@ -276,11 +256,10 @@ END IF;
 
 COMMIT;
 
-END $$ DELIMITER;
+END;
 
--- function Max_amount_Self_Apply_loan
-DELIMITER $$
-CREATE FUNCTION Max_amount_Self_Apply_Loan (IN p_customer_id INT) RETURNS DECIMAL(10, 2) DETERMINISTIC READS SQL DATA BEGIN DECLARE max_loan_amount DECIMAL(10, 2);
+--function to calculate the maximum loan amount for self apply loans(online)
+CREATE FUNCTION Max_amount_Self_Apply_Loan (p_customer_id INT) RETURNS DECIMAL(10, 2) DETERMINISTIC READS SQL DATA BEGIN DECLARE max_loan_amount DECIMAL(10, 2);
 
 DECLARE fd_balance DECIMAL(10, 2);
 
@@ -305,31 +284,27 @@ END IF;
 
 RETURN max_loan_amount;
 
-END $$ DELIMITER;
+END;
 
---Self Apply Loan procedure
-DELIMITER $$
 CREATE PROCEDURE Self_Apply_Loan (
   IN p_customer_id INT,
   IN p_loan_type ENUM('Business', 'Personal'),
   IN p_amount DECIMAL(10, 2),
   IN p_purpose VARCHAR(300),
-  IN p_time_period INT -- Time period for the loan (in months)
+  IN p_time_period INT
 ) BEGIN DECLARE v_max_loan_amount DECIMAL(10, 2);
 
 DECLARE v_savings_acc_id INT;
 
 DECLARE v_fd_id INT;
 
-DECLARE newloanID INT;
+DECLARE interestRate DECIMAL(5, 3);
 
 DECLARE startDate DATE;
 
 DECLARE endDate DATE;
 
-DECLARE interestRate DECIMAL(5, 3);
-
--- Variable to store calculated interest rate
+-- Error handling
 DECLARE EXIT
 HANDLER FOR SQLEXCEPTION BEGIN
 ROLLBACK;
@@ -339,12 +314,6 @@ RESIGNAL;
 END;
 
 START TRANSACTION;
-
--- Manually generate the new LoanID
-SELECT
-  IFNULL(MAX(Loan_id), 0) + 1 INTO newloanID
-FROM
-  Loan;
 
 -- Check if the customer has an FD
 SELECT
@@ -375,7 +344,7 @@ SET
 
 END IF;
 
--- Interest rate calculation logic
+-- Interest rate calculation logic based on loan type and amount
 IF p_loan_type = 'Business' THEN IF p_amount > 50000 THEN
 SET
   interestRate = 0.035;
@@ -402,45 +371,29 @@ END IF;
 
 END IF;
 
--- Calculate loan startDate (today) and endDate (based on p_time_period)
+-- Calculate loan startDate (today) and endDate (based on time period)
 SET
   startDate = CURDATE();
 
 SET
   endDate = DATE_ADD(CURDATE(), INTERVAL p_time_period MONTH);
 
--- Create the loan
-INSERT INTO
-  Loan (
-    Loan_id,
-    Type,
-    Amount,
-    Interest_rate,
-    Purpose,
-    Customer_id,
-    Acc_id,
-    Activity_id,
-    StartDate,
-    EndDate
-  )
-VALUES
-  (
-    newloanID,
-    p_loan_type,
-    p_amount,
-    interestRate,
-    p_purpose,
-    p_customer_id,
-    v_savings_acc_id,
-    NULL,
-    startDate,
-    endDate
-  );
+-- Call Create_Loan procedure
+CALL Create_Loan (
+  p_loan_type,
+  p_amount,
+  interestRate,
+  p_purpose,
+  p_customer_id,
+  v_savings_acc_id,
+  startDate,
+  endDate,
+  NULL
+);
 
--- Insert calculated interestRate
 COMMIT;
 
 SELECT
   'Loan application successful.' AS Message;
 
-END $$ DELIMITER;
+END;
