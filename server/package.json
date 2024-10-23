@@ -3,9 +3,25 @@
   "version": "1.0.0",
   "description": "API Server for the Imaginary Seychelles Bank web system",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js"
   },
   "keywords": [],
   "author": "",
-  "license": "GPL-3.0"
+  "license": "GPL-3.0",
+  "dependencies": {
+    "compression": "^1.7.4",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.1",
+    "express-openapi": "^12.1.3",
+    "helmet": "^8.0.0",
+    "morgan": "^1.10.0"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.0",
+    "@types/express-openapi": "^1.9.0",
+    "nodemon": "^3.1.7"
+  },
+  "type": "module"
 }
