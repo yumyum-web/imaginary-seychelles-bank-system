@@ -5,7 +5,7 @@ import { ThemeProvider } from "./themes/themeProvider";
 function App() {
   return (
     <>
-      <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+      <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
         <SignIn />
       </ThemeProvider>
     </>
