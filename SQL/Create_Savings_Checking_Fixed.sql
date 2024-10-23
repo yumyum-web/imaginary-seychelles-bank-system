@@ -3,7 +3,30 @@ CREATE PROCEDURE Create_Savings_Account (
   IN p_BranchId INT,
   IN p_Balance DECIMAL(10, 2),
   IN p_SA_plan_id INT
-) BEGIN
+) BEGIN DECLARE Min_Balance DECIMAL(10, 2) DEFAULT 0;
+
+-- Get the minimum balance required for the specified savings account plan
+SELECT
+  Min_Balance INTO Min_Balance
+FROM
+  SA_plan
+WHERE
+  SA_plan_id = p_SA_plan_id;
+
+-- If the specified savings account plan ID is invalid, raise an error
+IF Min_Balance IS NULL THEN SIGNAL SQLSTATE '45000'
+SET
+  MESSAGE_TEXT = 'Invalid savings account plan ID.';
+
+END IF;
+
+-- Check if the initial balance meets the minimum balance requirement
+IF p_Balance < Min_Balance THEN SIGNAL SQLSTATE '45000'
+SET
+  MESSAGE_TEXT = 'Initial balance does not meet the minimum balance requirement.';
+
+END IF;
+
 -- Insert into Account table
 INSERT INTO
   Account (
