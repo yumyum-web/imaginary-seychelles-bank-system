@@ -244,17 +244,17 @@ COMMIT;
 END;
 
 -- function to calculate the maximum loan amount for self apply loans(online)
-CREATE FUNCTION Max_amount_Self_Apply_Loan (p_customer_id INT) RETURNS DECIMAL(10, 2) DETERMINISTIC READS SQL DATA BEGIN DECLARE max_loan_amount DECIMAL(10, 2);
+CREATE FUNCTION Max_amount_Self_Apply_Loan (p_FD_id INT) RETURNS DECIMAL(10, 2) BEGIN DECLARE max_loan_amount DECIMAL(10, 2);
 
 DECLARE fd_balance DECIMAL(10, 2);
 
 -- Get the total balance of all Fixed Deposits for the customer
 SELECT
-  COALESCE(SUM(Balance), 0) INTO fd_balance
+  Balance INTO fd_balance
 FROM
   Fixed_deposit
 WHERE
-  Customer_id = p_customer_id;
+  FD_id = p_FD_id;
 
 -- Calculate 60% of the FD balance
 SET
@@ -273,13 +273,13 @@ END;
 
 CREATE PROCEDURE Self_Apply_Loan (
   IN p_customer_id INT,
+  IN p_FD_id INT,
+  IN p_savings_acc_id INT,
   IN p_loan_type ENUM('Business', 'Personal'),
   IN p_amount DECIMAL(10, 2),
   IN p_purpose VARCHAR(300),
   IN p_time_period INT
 ) BEGIN DECLARE v_max_loan_amount DECIMAL(10, 2);
-
-DECLARE v_savings_acc_id INT;
 
 DECLARE v_fd_id INT;
 
@@ -302,13 +302,12 @@ START TRANSACTION;
 
 -- Check if the customer has an FD
 SELECT
-  FD_id,
-  Savings_acc_id INTO v_fd_id,
-  v_savings_acc_id
+  FD_id INTO v_fd_id
 FROM
   Fixed_deposit
 WHERE
-  Customer_id = p_customer_id
+  FD_id = p_FD_id
+  AND Customer_id = p_customer_id
 LIMIT
   1;
 
@@ -370,7 +369,7 @@ CALL Create_Loan (
   interestRate,
   p_purpose,
   p_customer_id,
-  v_savings_acc_id,
+  p_savings_acc_id,
   startDate,
   endDate,
   NULL
