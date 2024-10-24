@@ -20,7 +20,7 @@ app.use(helmet());
 app.use(morgan("dev"));
 app.use(compression());
 
-initialize({
+await initialize({
   app,
   apiDoc: v1ApiDoc,
   dependencies: {},
