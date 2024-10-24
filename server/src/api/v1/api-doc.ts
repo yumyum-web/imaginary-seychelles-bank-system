@@ -1,4 +1,6 @@
-const apiDoc = {
+import { OpenAPIV2 } from "openapi-types";
+
+const apiDoc: OpenAPIV2.Document = {
   swagger: "2.0",
   basePath: "/v1",
   info: {
