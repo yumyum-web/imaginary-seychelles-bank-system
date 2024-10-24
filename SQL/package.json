@@ -1,0 +1,25 @@
+{
+  "name": "sql",
+  "version": "1.0.0",
+  "description": "Database SQL scripts for the Imaginary Seychelles Bank web system",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "GPL-3.0",
+  "devDependencies": {
+    "prettier": "^3.3.3",
+    "prettier-plugin-sql": "^0.18.1"
+  },
+  "lint-staged": {
+    "*.sql": "prettier --write"
+  },
+  "prettier": {
+    "plugins": [
+      "prettier-plugin-sql"
+    ],
+    "language": "mysql",
+    "keywordCase": "upper"
+  }
+}
