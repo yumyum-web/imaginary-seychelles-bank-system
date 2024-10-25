@@ -8,7 +8,68 @@ const apiDoc: OpenAPIV3.Document = {
   },
   paths: {},
   components: {
-    schemas: {},
+    responses: {
+      Unauthorized: {
+        description: "401 Unauthorized",
+        content: {
+          "application/json": {
+            schema: {
+              type: "object",
+              properties: {
+                status: {
+                  type: "integer",
+                },
+                err: {
+                  type: "string",
+                },
+              },
+              required: ["status", "err"],
+            },
+          },
+        },
+      },
+      ValidationFail: {
+        description: "400 Validation failed",
+        content: {
+          "application/json": {
+            schema: {
+              type: "object",
+              properties: {
+                status: {
+                  type: "integer",
+                },
+                err: {
+                  type: "array",
+                  items: {
+                    $ref: "#/components/schemas/ValidationError",
+                  },
+                  nullable: true,
+                },
+              },
+              required: ["status", "err"],
+            },
+          },
+        },
+      },
+    },
+    schemas: {
+      ValidationError: {
+        type: "object",
+        properties: {
+          keyword: {
+            type: "string",
+          },
+          params: {
+            type: "object",
+          },
+          message: {
+            type: "string",
+          },
+        },
+        additionalProperties: true,
+        required: ["keyword", "params"],
+      },
+    },
   },
 };
 
