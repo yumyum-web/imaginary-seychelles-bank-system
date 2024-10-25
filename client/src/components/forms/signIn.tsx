@@ -60,7 +60,7 @@ export function UserAuthForm({
               name="username"
               render={({ field }) => (
                 <FormItem className="space-y-1">
-                  <FormLabel>Email</FormLabel>
+                  <FormLabel>Username</FormLabel>
                   <FormControl>
                     <Input placeholder="john_doe" {...field} />
                   </FormControl>

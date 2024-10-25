@@ -10,6 +10,8 @@ import Manager from "@/pages/manager/index";
 import { LateLoanInstallments } from "@/pages/manager/lateLoanInstallments";
 import { TotalTransactions } from "@/pages/manager/totalTransactions";
 import { LoanRequests } from "@/pages/manager/loanRequests";
+import Employee from "@/pages/employee";
+import { CreateSavingsAccount } from "@/pages/employee/createSavingsAccount";
 // import Dashboard from './pages/dashboard'
 // import Tasks from './pages/tasks'
 // import Chats from './pages/chats'
@@ -44,6 +46,17 @@ const router = createBrowserRouter([
           { path: "late-loan-installments", Component: LateLoanInstallments },
           { path: "total-transactions", Component: TotalTransactions },
           { path: "loan-requests", Component: LoanRequests },
+        ],
+      },
+      {
+        path: "employee",
+        Component: Employee,
+        errorElement: <GeneralError />,
+        children: [
+          { index: true, Component: CreateSavingsAccount },
+          { path: "create-savings-account", Component: CreateSavingsAccount },
+          // { path: "total-transactions", Component: TotalTransactions },
+          // { path: "loan-requests", Component: LoanRequests },
           //   {
           //     path: 'error-example',
           //     Component: ErrorExample,

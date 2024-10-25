@@ -4,7 +4,8 @@ import { Layout } from "@/layouts/layout";
 import { Button } from "@/components/custom/button";
 import Nav from "./nav";
 import { cn } from "@/lib/utils";
-import { managerLinks } from "@/routes/navlinks";
+import { managerLinks, employeeLinks } from "@/routes/navlinks";
+import { useUser } from "@/contexts/userContext";
 
 interface SidebarProps extends React.HTMLAttributes<HTMLElement> {
   isCollapsed: boolean;
@@ -16,6 +17,7 @@ export default function Sidebar({
   isCollapsed,
   setIsCollapsed,
 }: SidebarProps) {
+  const { user } = useUser();
   const [navOpened, setNavOpened] = useState(false);
 
   /* Make body not scrollable when navBar is opened */
@@ -80,8 +82,8 @@ export default function Sidebar({
             <div
               className={`flex flex-col justify-end truncate ${isCollapsed ? "invisible w-0" : "visible w-auto"}`}
             >
-              <span className="font-medium">Manager Dashboard</span>
-              <span className="text-xs">Moratuwa Branch</span>
+              <span className="font-medium">{user?.type} Dashboard</span>
+              <span className="text-xs">{user?.branch} Branch</span>
             </div>
           </div>
 
@@ -105,7 +107,7 @@ export default function Sidebar({
           className={`z-40 h-full flex-1 overflow-auto ${navOpened ? "max-h-screen" : "max-h-0 py-0 md:max-h-screen md:py-2"}`}
           closeNav={() => setNavOpened(false)}
           isCollapsed={isCollapsed}
-          links={managerLinks}
+          links={user?.type === "Manager" ? managerLinks : employeeLinks}
         />
 
         {/* Scrollbar width toggle button */}

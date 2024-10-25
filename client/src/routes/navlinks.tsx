@@ -1,16 +1,14 @@
 import {
-  IconApps,
-  IconChecklist,
   IconChartInfographic,
   IconTransfer,
   IconHourglassEmpty,
   IconLayoutDashboard,
-  IconMessages,
   IconRouteAltLeft,
-  IconSettings,
-  // IconTruck,
-  // IconBoxSeam,
-  // IconUsers,
+  IconCirclePlus,
+  IconPigMoney,
+  IconChecks,
+  IconBox,
+  IconHeartHandshake,
 } from "@tabler/icons-react";
 
 export interface NavLink {
@@ -69,27 +67,35 @@ export const employeeLinks = [
     icon: <IconLayoutDashboard size={18} />,
   },
   {
-    title: "Tasks",
-    label: "3",
-    href: "/employee/tasks",
-    icon: <IconChecklist size={18} />,
-  },
-  {
-    title: "Chats",
-    label: "9",
-    href: "/employee/chats",
-    icon: <IconMessages size={18} />,
-  },
-  {
-    title: "Apps",
+    title: "Open Accounts",
     label: "",
-    href: "/employee/apps",
-    icon: <IconApps size={18} />,
+    href: "/employee/open-accounts",
+    icon: <IconCirclePlus size={18} />,
+    sub: [
+      {
+        title: "Savings Account",
+        label: "",
+        href: "/employee/create-savings-account",
+        icon: <IconPigMoney size={18} />,
+      },
+      {
+        title: "Checkings Account",
+        label: "",
+        href: "/employee/create-checkings-account",
+        icon: <IconChecks size={18} />,
+      },
+      {
+        title: "Fixed Deposit",
+        label: "",
+        href: "/employee/create-fixed-deposit",
+        icon: <IconBox size={18} />,
+      },
+    ],
   },
   {
-    title: "Settings",
+    title: "Request Loans",
     label: "",
-    href: "/employee/settings",
-    icon: <IconSettings size={18} />,
+    href: "/employee/request-loans",
+    icon: <IconHeartHandshake size={18} />,
   },
 ];
