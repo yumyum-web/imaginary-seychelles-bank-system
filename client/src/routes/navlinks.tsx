@@ -35,7 +35,7 @@ export const managerLinks = [
   {
     title: "Loan Requests",
     label: "10",
-    href: "/manager/requests",
+    href: "/manager/loan-requests",
     icon: <IconRouteAltLeft size={18} />,
   },
   {
@@ -47,13 +47,13 @@ export const managerLinks = [
       {
         title: "Transactions",
         label: "9",
-        href: "/manager/transactions",
+        href: "/manager/total-transactions",
         icon: <IconTransfer size={18} />,
       },
       {
         title: "Late Loan Installments",
         label: "",
-        href: "/manager/lateloaninstallments",
+        href: "/manager/late-loan-installments",
         icon: <IconHourglassEmpty size={18} />,
       },
     ],
