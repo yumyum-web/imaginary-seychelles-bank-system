@@ -1,17 +1,18 @@
 import express from "express";
-import { initialize } from "express-openapi";
+import { OpenAPIBackend } from "openapi-backend";
 import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
 import compression from "compression";
 
 import v1ApiDoc from "./api/v1/api-doc.js";
-import { joinPaths, makeDirIfNotExists } from "./utils.js";
-import { paths } from "./config.js";
 import { ExpressError } from "./api/v1/errors.js";
-
-const pathsDir = joinPaths(paths.srcDir, "api", "v1", "paths");
-makeDirIfNotExists(pathsDir);
+import validationFail from "./api/v1/handlers/validationFail.js";
+import notFound from "./api/v1/handlers/notFound.js";
+import methodNotAllowed from "./api/v1/handlers/methodNotAllowed.js";
+import notImplemented from "./api/v1/handlers/notImplemented.js";
+import unauthorizedHandler from "./api/v1/handlers/unauthorizedHandler.js";
+import postResponseHandler from "./api/v1/handlers/postResponseHandler.js";
 
 const app = express();
 
@@ -21,12 +22,21 @@ app.use(helmet());
 app.use(morgan("dev"));
 app.use(compression());
 
-await initialize({
-  app,
-  apiDoc: v1ApiDoc,
-  dependencies: {},
-  paths: pathsDir,
+const api = new OpenAPIBackend({
+  definition: v1ApiDoc,
+  strict: true,
+  handlers: {
+    validationFail,
+    notFound,
+    methodNotAllowed,
+    notImplemented,
+    unauthorizedHandler,
+    postResponseHandler,
+  },
 });
+await api.init();
+// @ts-expect-error - Request types are trivially incompatible
+app.use("/api/v1", (req, res) => api.handleRequest(req, req, res));
 
 app.use(
   (
