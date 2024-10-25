@@ -218,7 +218,7 @@ VALUES
 INSERT INTO
   SA_plan (SA_plan_id, Name, Interest_rate, Min_balance)
 VALUES
-  (1, 'Children Savings Plan', 0.12, 100.00), -- No minimum balance
+  (1, 'Children Savings Plan', 0.12, 0.00), -- No minimum balance
   (2, 'Teen Savings Plan', 0.11, 500.00), -- Minimum balance: 500
   (3, 'Adult Savings Plan', 0.10, 1000.00), -- Minimum balance: 1000
   (4, 'Senior Savings Plan', 0.13, 1000.00);
@@ -334,6 +334,7 @@ INSERT INTO
     Purpose,
     Employee_id,
     Manager_id,
+    Time_Period,
     Status
   )
 VALUES
@@ -345,6 +346,7 @@ VALUES
     'Business Expansion',
     1,
     2,
+    12,
     'Accepted'
   ),
   (
@@ -355,6 +357,7 @@ VALUES
     'Home Renovation',
     4,
     3,
+    24,
     'Accepted'
   ),
   (
@@ -365,6 +368,7 @@ VALUES
     'Car Purchase',
     6,
     5,
+    24,
     'Accepted'
   );
 
@@ -378,63 +382,75 @@ INSERT INTO
     Request_id,
     Customer_id,
     Acc_id,
-    Activity_id
+    Activity_id,
+    StartDate,
+    EndDate
   )
 VALUES
   (
     1,
     'Business',
     50000.00,
-    0.05,
+    0.035,
     'Business Expansion',
     1,
     1,
     101,
-    1
+    1,
+    '2024-08-15',
+    '2025-08-15'
   ),
   (
     2,
     'Personal',
     20000.00,
-    0.03,
+    0.035,
     'Home Renovation',
     2,
     2,
     103,
-    2
+    2,
+    '2024-04-30',
+    '2026-04-30'
   ),
   (
     3,
     'Business',
     80000.00,
-    0.06,
+    0.035,
     'New Product Development',
     NULL,
     3,
     102,
-    3
+    3,
+    '2024-01-31',
+    '2025-01-31'
   ),
   (
     4,
     'Personal',
     15000.00,
-    0.04,
+    0.045,
     'Car Purchase',
     3,
     4,
     105,
-    4
+    4,
+    '2024-05-20',
+    '2026-05-20'
   ),
   (
     5,
     'Business',
     120000.00,
-    0.055,
+    0.035,
     'Office Renovation',
     NULL,
     5,
     105,
-    5
+    5,
+    '2024-09-18',
+    '2027-09-18'
   );
 
 INSERT INTO

@@ -1,32 +1,32 @@
 -- Branch table
 CREATE TABLE Branch (
-  Branch_id INT PRIMARY KEY,
-  Name VARCHAR(100),
-  Address VARCHAR(300)
+  Branch_id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+  Name VARCHAR(100) NOT NULL,
+  Address VARCHAR(300) NOT NULL
 );
 
 -- Customer table
 CREATE TABLE Customer (
-  Customer_id INT PRIMARY KEY,
-  Customer_type ENUM('Individual', 'Organization')
+  Customer_id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+  Customer_type ENUM('Individual', 'Organization') NOT NULL
 );
 
 -- Login table
 CREATE TABLE Login (
-  Login_id INT PRIMARY KEY,
-  Username VARCHAR(25),
-  Password VARCHAR(25),
-  Password_last_update DATETIME
+  Login_id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+  Username VARCHAR(25) NOT NULL,
+  Password VARCHAR(25) NOT NULL,
+  Password_last_update DATETIME NOT NULL
 );
 
 -- User Table
 CREATE TABLE User (
-  NIC VARCHAR(12) PRIMARY KEY,
-  First_Name VARCHAR(100),
-  Last_Name VARCHAR(100),
-  Address VARCHAR(200),
-  Phone_number INT,
-  Date_of_Birth DATETIME,
+  NIC VARCHAR(12) PRIMARY KEY NOT NULL,
+  First_Name VARCHAR(100) NOT NULL,
+  Last_Name VARCHAR(100) NOT NULL,
+  Address VARCHAR(200) NOT NULL,
+  Phone_number INT NOT NULL,
+  Date_of_Birth DATETIME NOT NULL,
   Login_id INT,
   Customer_id INT,
   FOREIGN KEY (Login_id) REFERENCES Login (Login_id),
@@ -35,29 +35,29 @@ CREATE TABLE User (
 
 -- Account table
 CREATE TABLE Account (
-  Acc_id INT PRIMARY KEY,
-  Branch_id INT,
-  Customer_id INT,
-  Type ENUM('Savings', 'Checking'),
+  Acc_id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+  Branch_id INT NOT NULL,
+  Customer_id INT NOT NULL,
+  Type ENUM('Savings', 'Checking') NOT NULL,
   Balance DECIMAL(10, 2) CHECK (Balance > 0.00),
-  Opened_date DATETIME,
+  Opened_date DATETIME NOT NULL,
   FOREIGN KEY (Branch_id) REFERENCES Branch (Branch_id),
   FOREIGN KEY (Customer_id) REFERENCES Customer (Customer_id)
 );
 
 -- SA_plan table
 CREATE TABLE SA_plan (
-  SA_plan_id INT PRIMARY KEY,
-  Name VARCHAR(30),
+  SA_plan_id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+  Name VARCHAR(30) NOT NULL,
   Interest_rate DECIMAL(4, 3) CHECK (Interest_rate BETWEEN 0 AND 1),
-  Min_balance DECIMAL(10, 2) CHECK (Min_balance > 0.00)
+  Min_balance DECIMAL(10, 2) CHECK (Min_balance >= 0.00)
 );
 
 -- Savings_Account table
 CREATE TABLE Savings_Account (
-  Savings_acc_id INT PRIMARY KEY,
-  Acc_id INT,
-  SA_plan_id INT,
+  Savings_acc_id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+  Acc_id INT NOT NULL,
+  SA_plan_id INT NOT NULL,
   No_of_withdrawals INT CHECK (No_of_withdrawals >= 0),
   FOREIGN KEY (Acc_id) REFERENCES Account (Acc_id),
   FOREIGN KEY (SA_plan_id) REFERENCES SA_plan (SA_plan_id)
@@ -65,11 +65,11 @@ CREATE TABLE Savings_Account (
 
 -- Employee table
 CREATE TABLE Employee (
-  Employee_id INT PRIMARY KEY,
-  NIC VARCHAR(12),
-  Branch_id INT,
-  POSITION VARCHAR(25),
-  Start_date DATETIME,
+  Employee_id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+  NIC VARCHAR(12) NOT NULL,
+  Branch_id INT NOT NULL,
+  POSITION VARCHAR(25) NOT NULL,
+  Start_date DATETIME NOT NULL,
   End_date DATETIME,
   FOREIGN KEY (NIC) REFERENCES User (NIC),
   FOREIGN KEY (Branch_id) REFERENCES Branch (Branch_id)
@@ -77,27 +77,28 @@ CREATE TABLE Employee (
 
 -- Activity table
 CREATE TABLE Activity (
-  Activity_id INT PRIMARY KEY,
+  Activity_id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
   Type ENUM(
     'Online Transfer',
     'Loan Deposit',
     'Loan Installment',
     'Interest'
-  ),
+  ) NOT NULL,
   Amount DECIMAL(10, 2) CHECK (Amount > 0.00),
-  DATE DATETIME
+  DATE DATETIME NOT NULL
 );
 
 -- Loan_Request table
 CREATE TABLE Loan_Request (
-  Request_id INT PRIMARY KEY,
-  Loan_type ENUM('Business', 'Personal'),
-  Acc_id INT,
+  Request_id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+  Loan_type ENUM('Business', 'Personal') NOT NULL,
+  Acc_id INT NOT NULL,
   Amount DECIMAL(10, 2) CHECK (Amount > 0.00),
-  Purpose VARCHAR(300),
-  Employee_id INT,
+  Purpose VARCHAR(300) NOT NULL,
+  Employee_id INT NOT NULL,
   Manager_id INT,
-  Status ENUM('Pending', 'Accepted', 'Rejected'),
+  Time_Period INT NOT NULL,
+  Status ENUM('Pending', 'Accepted', 'Rejected') NOT NULL,
   FOREIGN KEY (Acc_id) REFERENCES Account (Acc_id),
   FOREIGN KEY (Employee_id) REFERENCES Employee (Employee_id),
   FOREIGN KEY (Manager_id) REFERENCES Employee (Employee_id)
@@ -105,15 +106,17 @@ CREATE TABLE Loan_Request (
 
 -- Loan table
 CREATE TABLE Loan (
-  Loan_id INT PRIMARY KEY,
-  Type ENUM('Business', 'Personal'),
+  Loan_id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+  Type ENUM('Business', 'Personal') NOT NULL,
   Amount DECIMAL(10, 2) CHECK (Amount > 0.00),
   Interest_rate DECIMAL(4, 3) CHECK (Interest_rate BETWEEN 0 AND 1),
-  Purpose VARCHAR(300),
+  Purpose VARCHAR(300) NOT NULL,
   Request_id INT,
-  Customer_id INT,
-  Acc_id INT,
-  Activity_id INT,
+  Customer_id INT NOT NULL,
+  Acc_id INT NOT NULL,
+  Activity_id INT NOT NULL,
+  StartDate DATE NOT NULL,
+  EndDate DATE NOT NULL,
   FOREIGN KEY (Request_id) REFERENCES Loan_Request (Request_id),
   FOREIGN KEY (Customer_id) REFERENCES Customer (Customer_id),
   FOREIGN KEY (Activity_id) REFERENCES Activity (Activity_id),
@@ -122,20 +125,20 @@ CREATE TABLE Loan (
 
 -- FD_plan table
 CREATE TABLE FD_plan (
-  FD_plan_id INT PRIMARY KEY,
-  Duration INT,
+  FD_plan_id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+  Duration INT CHECK (Duration > 0),
   Interest_rate DECIMAL(4, 3) CHECK (Interest_rate BETWEEN 0 AND 1)
 );
 
 -- Fixed_deposit table
 CREATE TABLE Fixed_deposit (
-  FD_id INT PRIMARY KEY,
-  Branch_id INT,
-  Customer_id INT,
+  FD_id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+  Branch_id INT NOT NULL,
+  Customer_id INT NOT NULL,
   Balance DECIMAL(10, 2) CHECK (Balance > 0.00),
-  Savings_acc_id INT,
-  Opened_date DATETIME,
-  FD_plan_id INT,
+  Savings_acc_id INT NOT NULL,
+  Opened_date DATETIME NOT NULL,
+  FD_plan_id INT NOT NULL,
   FOREIGN KEY (Branch_id) REFERENCES Branch (Branch_id),
   FOREIGN KEY (Customer_id) REFERENCES Customer (Customer_id),
   FOREIGN KEY (Savings_acc_id) REFERENCES Savings_Account (Savings_acc_id),
@@ -144,18 +147,18 @@ CREATE TABLE Fixed_deposit (
 
 -- Transaction table
 CREATE TABLE Transaction (
-  Transaction_id INT PRIMARY KEY,
-  Acc_id INT,
-  Activity_id INT,
-  Type ENUM('Deposit', 'Withdrawal'),
+  Transaction_id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+  Acc_id INT NOT NULL,
+  Activity_id INT NOT NULL,
+  Type ENUM('Deposit', 'Withdrawal') NOT NULL,
   FOREIGN KEY (Acc_id) REFERENCES Account (Acc_id),
   FOREIGN KEY (Activity_id) REFERENCES Activity (Activity_id)
 );
 
 -- Loan_Installments table
 CREATE TABLE Loan_Installments (
-  Loan_id INT,
-  DATE DATETIME,
+  Loan_id INT NOT NULL,
+  DATE DATETIME NOT NULL,
   Amount DECIMAL(10, 2) CHECK (Amount >= 0.00),
   Activity_id INT,
   FOREIGN KEY (Loan_id) REFERENCES Loan (Loan_id),
@@ -164,12 +167,12 @@ CREATE TABLE Loan_Installments (
 
 -- Organization table
 CREATE TABLE Organization (
-  Organization_id INT PRIMARY KEY,
-  Organization_name VARCHAR(100),
-  Type VARCHAR(100),
-  Address VARCHAR(200),
-  Phone_number INT,
-  Date_of_incorporation DATETIME,
+  Organization_id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+  Organization_name VARCHAR(100) NOT NULL,
+  Type VARCHAR(100) NOT NULL,
+  Address VARCHAR(200) NOT NULL,
+  Phone_number INT NOT NULL,
+  Date_of_incorporation DATETIME NOT NULL,
   Login_id INT,
   Customer_id INT,
   FOREIGN KEY (Login_id) REFERENCES Login (Login_id),

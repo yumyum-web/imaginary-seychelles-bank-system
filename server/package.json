@@ -3,9 +3,40 @@
   "version": "1.0.0",
   "description": "API Server for the Imaginary Seychelles Bank web system",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsc",
+    "start": "node build/server.js",
+    "dev": "tsx watch src/server.ts"
   },
   "keywords": [],
   "author": "",
-  "license": "GPL-3.0"
+  "license": "GPL-3.0",
+  "dependencies": {
+    "@eslint/js": "^9.13.0",
+    "compression": "^1.7.4",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "eslint": "^9.13.0",
+    "express": "^4.21.1",
+    "express-openapi": "^12.1.3",
+    "globals": "^15.11.0",
+    "helmet": "^8.0.0",
+    "morgan": "^1.10.0",
+    "prettier": "^3.3.3"
+  },
+  "devDependencies": {
+    "@types/compression": "^1.7.5",
+    "@types/cors": "^2.8.17",
+    "@types/eslint__js": "^8.42.3",
+    "@types/express": "^5.0.0",
+    "@types/morgan": "^1.9.9",
+    "openapi-types": "^12.1.3",
+    "tsx": "^4.19.1",
+    "typescript": "^5.5.3",
+    "typescript-eslint": "^8.7.0"
+  },
+  "lint-staged": {
+    "*.ts": "eslint --fix",
+    "*.{md,ts}": "prettier --write"
+  },
+  "type": "module"
 }
