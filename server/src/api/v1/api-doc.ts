@@ -70,7 +70,19 @@ const apiDoc: OpenAPIV3.Document = {
         required: ["keyword", "params"],
       },
     },
+    securitySchemes: {
+      jwt: {
+        type: "http",
+        scheme: "bearer",
+        bearerFormat: "JWT",
+      },
+    },
   },
+  security: [
+    {
+      jwt: [],
+    },
+  ],
 };
 
 export default apiDoc;

@@ -12,7 +12,7 @@ import notFound from "./api/v1/handlers/notFound.js";
 import methodNotAllowed from "./api/v1/handlers/methodNotAllowed.js";
 import notImplemented from "./api/v1/handlers/notImplemented.js";
 import unauthorizedHandler from "./api/v1/handlers/unauthorizedHandler.js";
-import postResponseHandler from "./api/v1/handlers/postResponseHandler.js";
+import jwtHandler from "./api/v1/securityHandlers/jwtHandler.js";
 
 const app = express();
 
@@ -21,6 +21,7 @@ app.use(cors());
 app.use(helmet());
 app.use(morgan("dev"));
 app.use(compression());
+app.use(express.json());
 
 const api = new OpenAPIBackend({
   definition: v1ApiDoc,
@@ -31,9 +32,9 @@ const api = new OpenAPIBackend({
     methodNotAllowed,
     notImplemented,
     unauthorizedHandler,
-    postResponseHandler,
   },
 });
+api.registerSecurityHandler("jwt", jwtHandler);
 await api.init();
 // @ts-expect-error - Request types are trivially incompatible
 app.use("/api/v1", (req, res) => api.handleRequest(req, req, res));
