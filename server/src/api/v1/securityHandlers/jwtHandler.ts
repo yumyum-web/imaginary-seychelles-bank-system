@@ -1,7 +1,7 @@
-import jwt from "jsonwebtoken";
 import { Handler } from "openapi-backend";
 
-import { config } from "../../config.js";
+import { decodeJwt } from "../helpers/jwt.js";
+import { isLevelSufficientForSecurityRequirements } from "../helpers/accessHierarchy.js";
 
 const jwtHandler: Handler = (c) => {
   const authHeader = c.request.headers["authorization"];
@@ -10,7 +10,16 @@ const jwtHandler: Handler = (c) => {
   }
 
   const token = authHeader.replace("Bearer ", "");
-  return jwt.verify(token, config.jwtTokenSecret);
+  const user = decodeJwt(token);
+  if (
+    user.levels.some((l) =>
+      isLevelSufficientForSecurityRequirements(l, c.operation.security),
+    )
+  ) {
+    throw new Error("Insufficient access level");
+  }
+
+  return user;
 };
 
 export default jwtHandler;
