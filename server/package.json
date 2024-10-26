@@ -22,6 +22,7 @@
     "helmet": "^8.0.0",
     "jsonwebtoken": "^9.0.2",
     "morgan": "^1.10.0",
+    "mysql2": "^3.11.3",
     "openapi-backend": "^5.11.0",
     "prettier": "^3.3.3"
   },
