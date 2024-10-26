@@ -1,29 +1,17 @@
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { config } from "../../config.js";
-
-class User {
-  id: number;
-  levels: string[];
-
-  constructor(id: number, levels: string[]) {
-    this.id = id;
-    this.levels = levels;
-  }
-}
+import { User, validateUser } from "../models/User.js";
 
 // constructs a User object from a JwtPayload, throws an error if the JwtPayload is invalid
 function userFromJwtPayload(obj: JwtPayload | string): User {
-  if (
-    !obj ||
-    typeof obj !== "object" ||
-    typeof obj.user !== "object" ||
-    typeof obj.user.id !== "number" ||
-    !Array.isArray(obj.user.levels) ||
-    !obj.user.levels.every((l: unknown) => typeof l === "string")
-  ) {
+  if (!obj || typeof obj !== "object" || typeof obj.user !== "object") {
     throw new Error("Invalid JWT payload");
   }
-  return new User(obj.user.id, obj.user.levels);
+  if (!validateUser(obj.user)) {
+    console.log(validateUser.errors);
+    throw new Error("Invalid JWT payload");
+  }
+  return obj.user as unknown as User;
 }
 
 function decodeJwt(token: string) {
