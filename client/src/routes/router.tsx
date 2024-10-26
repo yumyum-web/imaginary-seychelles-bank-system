@@ -12,6 +12,7 @@ import { TotalTransactions } from "@/pages/manager/totalTransactions";
 import { LoanRequests } from "@/pages/manager/loanRequests";
 import Employee from "@/pages/employee";
 import { CreateSavingsAccount } from "@/pages/employee/createSavingsAccount";
+import { CreateCheckingsAccount } from "@/pages/employee/createCheckingAccount";
 // import Dashboard from './pages/dashboard'
 // import Tasks from './pages/tasks'
 // import Chats from './pages/chats'
@@ -55,6 +56,10 @@ const router = createBrowserRouter([
         children: [
           { index: true, Component: CreateSavingsAccount },
           { path: "create-savings-account", Component: CreateSavingsAccount },
+          {
+            path: "create-checkings-account",
+            Component: CreateCheckingsAccount,
+          },
           // { path: "total-transactions", Component: TotalTransactions },
           // { path: "loan-requests", Component: LoanRequests },
           //   {
