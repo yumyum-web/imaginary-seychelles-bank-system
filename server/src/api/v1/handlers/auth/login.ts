@@ -13,15 +13,26 @@ const login: Handler<LoginRequestBody> = async (c, _, res) => {
   const { username, password } = c.request.requestBody;
 
   const customerQuery = `
-        SELECT c.Customer_id, c.Customer_type
-        FROM Login l
-                 JOIN User u ON l.Login_id = u.Login_id
-                 JOIN Customer c ON u.Customer_id = c.Customer_id
-        WHERE l.Username = ?
-          AND l.Password = ?
-          AND (c.Customer_type = 'Individual' OR c.Customer_type = 'Organization');
+        SELECT Customer_id, Customer_type
+        FROM (SELECT Customer_id, Customer_type
+              FROM Login
+                       JOIN Organization USING (Login_id)
+                       JOIN Customer USING (Customer_id)
+              WHERE Username = ?
+                AND Password = ?
+
+              UNION ALL
+
+              SELECT Customer_id, Customer_type
+              FROM Login
+                       JOIN User USING (Login_id)
+                       JOIN Customer USING (Customer_id)
+              WHERE Username = ?
+                AND Password = ?) AS combined_results;
     `;
   const [customerResult] = await conn.execute<RowDataPacket[]>(customerQuery, [
+    username,
+    password,
     username,
     password,
   ]);
