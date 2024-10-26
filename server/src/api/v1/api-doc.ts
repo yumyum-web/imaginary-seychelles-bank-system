@@ -6,7 +6,78 @@ const apiDoc: OpenAPIV3.Document = {
     title: "Backend API for the Imaginary Seychelles Bank web system.",
     version: "1.0.0",
   },
-  paths: {},
+  paths: {
+    "/auth/login": {
+      post: {
+        summary: "Login to the system",
+        operationId: "login",
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                properties: {
+                  username: {
+                    type: "string",
+                  },
+                  password: {
+                    type: "string",
+                  },
+                },
+                required: ["username", "password"],
+              },
+            },
+          },
+        },
+        security: [],
+        responses: {
+          200: {
+            description: "Successful login",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    token: {
+                      type: "string",
+                    },
+                    user: {
+                      type: "object",
+                      properties: {
+                        levels: { type: "array", items: { type: "string" } },
+                        customer: {
+                          type: "object",
+                          properties: {
+                            id: { type: "number" },
+                            type: { type: "string" },
+                          },
+                        },
+                        employee: {
+                          type: "object",
+                          properties: { id: { type: "number" } },
+                        },
+                      },
+                      required: ["levels"],
+                      anyOf: [
+                        { required: ["customer"] },
+                        { required: ["employee"] },
+                      ],
+                      additionalProperties: false,
+                    },
+                  },
+                  required: ["token", "user"],
+                },
+              },
+            },
+          },
+          400: {
+            $ref: "#/components/responses/ValidationFail",
+          },
+        },
+      },
+    },
+  },
   components: {
     responses: {
       Unauthorized: {

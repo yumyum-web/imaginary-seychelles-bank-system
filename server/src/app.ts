@@ -13,6 +13,7 @@ import methodNotAllowed from "./api/v1/handlers/methodNotAllowed.js";
 import notImplemented from "./api/v1/handlers/notImplemented.js";
 import unauthorizedHandler from "./api/v1/handlers/unauthorizedHandler.js";
 import jwtHandler from "./api/v1/securityHandlers/jwtHandler.js";
+import login from "./api/v1/handlers/auth/login.js";
 
 const app = express();
 
@@ -27,6 +28,7 @@ const api = new OpenAPIBackend({
   definition: v1ApiDoc,
   strict: true,
   handlers: {
+    login,
     validationFail,
     notFound,
     methodNotAllowed,
