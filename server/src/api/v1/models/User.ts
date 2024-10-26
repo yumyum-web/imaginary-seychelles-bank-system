@@ -3,12 +3,12 @@ import { Ajv } from "ajv";
 class User {
   levels: string[];
   customer?: { id: number; type: string };
-  employee?: { id: number };
+  employee?: { id: number; branchId: number };
 
   constructor(
     levels: string[],
     customer?: { id: number; type: string },
-    employee?: { id: number },
+    employee?: { id: number; branchId: number },
   ) {
     this.levels = levels;
     this.customer = customer;
@@ -24,7 +24,10 @@ const userSchema = {
       type: "object",
       properties: { id: { type: "number" }, type: { type: "string" } },
     },
-    employee: { type: "object", properties: { id: { type: "number" } } },
+    employee: {
+      type: "object",
+      properties: { id: { type: "number" }, branchId: { type: "number" } },
+    },
   },
   required: ["levels"],
   anyOf: [{ required: ["customer"] }, { required: ["employee"] }],

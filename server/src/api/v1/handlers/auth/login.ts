@@ -38,7 +38,7 @@ const login: Handler<LoginRequestBody> = async (c, _, res) => {
   ]);
 
   const employeeQuery = `
-        SELECT e.Employee_id, e.POSITION
+        SELECT e.Employee_id, e.POSITION, e.Branch_id
         FROM Login l
                  JOIN User u ON l.Login_id = u.Login_id
                  JOIN Employee e ON u.NIC = e.NIC
@@ -68,8 +68,8 @@ const login: Handler<LoginRequestBody> = async (c, _, res) => {
   }
 
   if (employeeResult.length > 0) {
-    const { Employee_id, POSITION } = employeeResult[0];
-    user.employee = { id: Employee_id };
+    const { Employee_id, POSITION, Branch_id } = employeeResult[0];
+    user.employee = { id: Employee_id, branchId: Branch_id };
     if (POSITION === "Branch Manager") {
       user.levels.push("manager");
     } else {
