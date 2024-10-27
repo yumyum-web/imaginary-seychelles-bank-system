@@ -1,40 +1,44 @@
 import { Handler } from "openapi-backend";
 import conn from "../../helpers/db.js";
 import { RowDataPacket } from "mysql2";
+import { User } from "../../models/User.js";
 
 interface SelfApplyRequestBody {
-  customerId: number;
   FDId: number;
-  savingsAccId: number;
+  savingsAccountId: number;
   loanType: string;
   amount: number;
   purpose: string;
   timePeriod: number;
 }
 
-const selfapply: Handler<SelfApplyRequestBody> = async (c, _, res) => {
-  const {
-    customerId,
-    FDId,
-    savingsAccId,
-    loanType,
-    amount,
-    purpose,
-    timePeriod,
-  } = c.request.requestBody;
+const selfApply: Handler<SelfApplyRequestBody> = async (c, _, res) => {
+  const { FDId, savingsAccountId, loanType, amount, purpose, timePeriod } =
+    c.request.requestBody;
+  const user: User = c.security.jwt;
 
   try {
     // Call stored procedure for self-apply loan
-    const selfApplyQuery = "CALL Self_Apply_Loan(?, ?, ?, ?, ?, ?, ?)";
+    const selfApplyQuery = `CALL Self_Apply_Loan(?, ?, ?, ?, ?, ?, ?)`;
     const [selfApplyResult] = await conn.execute<RowDataPacket[]>(
       selfApplyQuery,
-      [customerId, FDId, savingsAccId, loanType, amount, purpose, timePeriod],
+      [
+        user.customer?.id,
+        FDId,
+        savingsAccountId,
+        loanType,
+        amount,
+        purpose,
+        timePeriod,
+      ],
     );
 
+    console.log("Self apply result:", selfApplyResult);
     // Check if the procedure executed successfully
     if (
-      selfApplyResult &&
-      selfApplyResult[0]?.Message === "Loan application successful."
+      selfApplyResult.length !== 0 &&
+      selfApplyResult[0].length !== 0 &&
+      selfApplyResult[0][0]?.Message === "Loan created successfully."
     ) {
       return res.status(201).json({
         message: "Loan application successful.",
@@ -51,4 +55,4 @@ const selfapply: Handler<SelfApplyRequestBody> = async (c, _, res) => {
   }
 };
 
-export default selfapply;
+export default selfApply;

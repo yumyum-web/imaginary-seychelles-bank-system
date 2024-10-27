@@ -77,11 +77,10 @@ const apiDoc: OpenAPIV3.Document = {
         },
       },
     },
-    "/loans/selfapply": {
-      // New Endpoint
+    "/loan/selfApply": {
       post: {
         summary: "Self-apply for a loan",
-        operationId: "selfapply",
+        operationId: "selfApply",
         requestBody: {
           required: true,
           content: {
@@ -89,13 +88,10 @@ const apiDoc: OpenAPIV3.Document = {
               schema: {
                 type: "object",
                 properties: {
-                  customerId: {
-                    type: "integer",
-                  },
                   FDId: {
                     type: "integer",
                   },
-                  savingsAccId: {
+                  savingsAccountId: {
                     type: "integer",
                   },
                   loanType: {
@@ -114,9 +110,8 @@ const apiDoc: OpenAPIV3.Document = {
                   },
                 },
                 required: [
-                  "customerId",
                   "FDId",
-                  "savingsAccId",
+                  "savingsAccountId",
                   "loanType",
                   "amount",
                   "purpose",
@@ -588,7 +583,6 @@ const apiDoc: OpenAPIV3.Document = {
           },
         },
         additionalProperties: true,
-        required: ["keyword", "params"],
       },
     },
     securitySchemes: {

@@ -16,7 +16,7 @@ import jwtHandler from "./api/v1/securityHandlers/jwtHandler.js";
 import login from "./api/v1/handlers/auth/login.js";
 import create from "./api/v1/handlers/loan/create.js";
 import details from "./api/v1/handlers/loan/details.js";
-import selfapply from "./api/v1/handlers/loan/selfapply.js";
+import selfApply from "./api/v1/handlers/loan/selfapply.js";
 import list from "./api/v1/handlers/loan/list.js";
 import process from "./api/v1/handlers/loan/process.js";
 
@@ -38,7 +38,7 @@ const api = new OpenAPIBackend({
     details,
     list,
     process,
-    selfapply,
+    selfApply,
     validationFail,
     notFound,
     methodNotAllowed,
