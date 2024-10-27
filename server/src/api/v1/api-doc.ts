@@ -626,6 +626,46 @@ const apiDoc: OpenAPIV3.Document = {
         },
       },
     },
+    "/account/savings/plans": {
+      get: {
+        summary: "List available savings account plans",
+        operationId: "savingsAccountPlans",
+        security: [
+          {
+            jwt: ["logged-in"],
+          },
+        ],
+        responses: {
+          200: {
+            description: "Successful operation",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "array",
+                  items: {
+                    $ref: "#/components/schemas/SavingsAccountPlan",
+                  },
+                },
+              },
+            },
+          },
+          500: {
+            description: "Failed to list savings account plans",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    message: { type: "string" },
+                  },
+                  required: ["message"],
+                },
+              },
+            },
+          },
+        },
+      },
+    },
   },
   components: {
     responses: {
@@ -820,6 +860,16 @@ const apiDoc: OpenAPIV3.Document = {
           "branchId",
           "branchName",
         ],
+      },
+      SavingsAccountPlan: {
+        type: "object",
+        properties: {
+          id: { type: "integer" },
+          name: { type: "string" },
+          interestRate: { type: "number", format: "float" },
+          minimumBalance: { type: "number", format: "float" },
+        },
+        required: ["id", "name", "interestRate", "minimumBalance"],
       },
       User: {
         type: "object",
