@@ -81,7 +81,7 @@ const apiDoc: OpenAPIV3.Document = {
       // New Endpoint
       post: {
         summary: "Self-apply for a loan",
-        operationId: "selfApplyLoan",
+        operationId: "selfapply",
         requestBody: {
           required: true,
           content: {
@@ -170,7 +170,7 @@ const apiDoc: OpenAPIV3.Document = {
       // New Endpoint
       post: {
         summary: "Create a loan request",
-        operationId: "createLoanRequest",
+        operationId: "create",
         requestBody: {
           required: true,
           content: {
@@ -277,7 +277,7 @@ const apiDoc: OpenAPIV3.Document = {
       // New endpoint for accepting or rejecting a loan request
       post: {
         summary: "Accept or reject a loan request",
-        operationId: "acceptLoanRequest",
+        operationId: "process",
         requestBody: {
           required: true,
           content: {
@@ -349,7 +349,7 @@ const apiDoc: OpenAPIV3.Document = {
     "/loans/details": {
       get: {
         summary: "Retrieve loan details for a customer",
-        operationId: "getLoanDetails",
+        operationId: "details",
         parameters: [
           {
             name: "loanId",
@@ -383,8 +383,8 @@ const apiDoc: OpenAPIV3.Document = {
                     amount: { type: "number", format: "float" },
                     purpose: { type: "string" },
                     interestRate: { type: "number", format: "float" },
-                    startDate: { type: "string", format: "date" },
-                    endDate: { type: "string", format: "date" },
+                    startDate: { type: "string" },
+                    endDate: { type: "string" },
                     status: { type: "string" },
                     timePeriod: { type: "integer" },
                   },
@@ -437,7 +437,7 @@ const apiDoc: OpenAPIV3.Document = {
     "/loan/list": {
       get: {
         summary: "Get all loan requests",
-        operationId: "getAllLoanRequests",
+        operationId: "list",
         responses: {
           200: {
             description: "Successful retrieval of loan requests",
@@ -474,7 +474,6 @@ const apiDoc: OpenAPIV3.Document = {
                       },
                       createdAt: {
                         type: "string",
-                        format: "date-time",
                       },
                     },
                     required: [

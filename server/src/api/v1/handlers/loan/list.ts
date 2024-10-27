@@ -13,7 +13,7 @@ interface LoanRequest extends RowDataPacket {
   createdAt: string; // Or Date, depending on how you want to handle it
 }
 
-const list: Handler = async (c, _, res) => {
+const list: Handler = async (__, _, res) => {
   try {
     // Query to get all loan requests
     const [rows] = await conn.execute<LoanRequest[]>(
