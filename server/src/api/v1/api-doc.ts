@@ -124,6 +124,11 @@ const apiDoc: OpenAPIV3.Document = {
             },
           },
         },
+        security: [
+          {
+            jwt: ["customer"],
+          },
+        ],
         responses: {
           201: {
             description: "Loan application successful",
