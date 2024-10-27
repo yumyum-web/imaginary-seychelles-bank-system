@@ -55,7 +55,10 @@ const apiDoc: OpenAPIV3.Document = {
                         },
                         employee: {
                           type: "object",
-                          properties: { id: { type: "number" } },
+                          properties: {
+                            id: { type: "number" },
+                            branchId: { type: "number" },
+                          },
                         },
                       },
                       required: ["levels"],
