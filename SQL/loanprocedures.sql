@@ -131,7 +131,6 @@ SELECT
   Time_period INTO requestStatus,
   loanAmount,
   accountId,
-  customerId,
   loanType,
   loanPurpose,
   timePeriod
@@ -151,6 +150,14 @@ SET
   MESSAGE_TEXT = 'Loan request has already been processed.';
 
 END IF;
+
+-- get the customer id
+SELECT
+  Customer_id INTO customerId
+FROM
+  Account
+WHERE
+  Acc_id = accountId;
 
 -- Validate manager exists
 IF NOT EXISTS (

@@ -14,6 +14,14 @@ import notImplemented from "./api/v1/handlers/notImplemented.js";
 import unauthorizedHandler from "./api/v1/handlers/unauthorizedHandler.js";
 import jwtHandler from "./api/v1/securityHandlers/jwtHandler.js";
 import login from "./api/v1/handlers/auth/login.js";
+import createLoanRequest from "./api/v1/handlers/loan/request/create.js";
+import listLoans from "./api/v1/handlers/loan/list.js";
+import selfApply from "./api/v1/handlers/loan/selfapply.js";
+import listLoanRequests from "./api/v1/handlers/loan/request/list.js";
+import processLoanRequest from "./api/v1/handlers/loan/request/process.js";
+import userProfile from "./api/v1/handlers/profile/user.js";
+import organizationProfile from "./api/v1/handlers/profile/organization.js";
+import employeeProfile from "./api/v1/handlers/profile/employee.js";
 import listSavingsAccounts from "./api/v1/handlers/account/savings/listSavingsAccounts.js";
 
 const app = express();
@@ -30,7 +38,15 @@ const api = new OpenAPIBackend({
   strict: true,
   handlers: {
     login,
+    userProfile,
+    organizationProfile,
+    employeeProfile,
     listSavingsAccounts,
+    createLoanRequest,
+    listLoans,
+    listLoanRequests,
+    processLoanRequest,
+    selfApply,
     validationFail,
     notFound,
     methodNotAllowed,
