@@ -14,12 +14,17 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/custom/button";
 import { PasswordInput } from "@/components/custom/passwordInput";
 import { cn } from "@/lib/utils";
+import { useToast } from "@/hooks/use-toast"; // Import the toast hook
+import { login } from "@/api/auth"; // Import the login API function
+import { useUser } from "@/contexts/useUser";
+import { useNavigate } from "react-router-dom";
 
+// Define schema for validation
 const formSchema = z.object({
   username: z
     .string()
     .min(1, { message: "Please enter your username" })
-    .min(5, { message: "Username must contain atleast 5 characters" }),
+    .min(4, { message: "Username must contain at least 5 characters" }),
 
   password: z
     .string()
@@ -31,8 +36,13 @@ export function UserAuthForm({
   className,
   ...props
 }: HTMLAttributes<HTMLDivElement>) {
+  const { setUserLevels } = useUser();
   const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast(); // Destructure toast from useToast hook
 
+  const navigate = useNavigate();
+
+  // Initialize form with zod validation
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -41,13 +51,33 @@ export function UserAuthForm({
     },
   });
 
-  function onSubmit(data: z.infer<typeof formSchema>) {
+  // Handle form submission and login logic
+  async function onSubmit(data: z.infer<typeof formSchema>) {
     setIsLoading(true);
-    console.log(data);
+    try {
+      // Call the login API
+      const response = await login(data);
 
-    setTimeout(() => {
+      // Store token in localStorage or handle as needed
+      sessionStorage.setItem("token", response.token);
+      setUserLevels(response.user.levels);
+      navigate("/manager");
+      toast({
+        title: "Login Successful",
+        description: "Welcome back!",
+        variant: "default",
+      });
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      // Show error toast if login fails
+      toast({
+        title: "Login Failed",
+        description: error.message || "Invalid username or password",
+        variant: "destructive",
+      });
+    } finally {
       setIsLoading(false);
-    }, 3000);
+    }
   }
 
   return (
@@ -60,7 +90,7 @@ export function UserAuthForm({
               name="username"
               render={({ field }) => (
                 <FormItem className="space-y-1">
-                  <FormLabel>Email</FormLabel>
+                  <FormLabel>Username</FormLabel>
                   <FormControl>
                     <Input placeholder="john_doe" {...field} />
                   </FormControl>
@@ -83,8 +113,8 @@ export function UserAuthForm({
                 </FormItem>
               )}
             />
-            <Button className="mt-2 text-md" loading={isLoading}>
-              Login
+            <Button type="submit" className="mt-2 text-md" loading={isLoading}>
+              {isLoading ? "Logging in..." : "Login"}
             </Button>
           </div>
         </form>
