@@ -22,9 +22,9 @@ import processLoanRequest from "./api/v1/handlers/loan/request/process.js";
 import userProfile from "./api/v1/handlers/profile/user.js";
 import organizationProfile from "./api/v1/handlers/profile/organization.js";
 import employeeProfile from "./api/v1/handlers/profile/employee.js";
-import listSavingsAccounts from "./api/v1/handlers/account/savings/listSavingsAccounts.js";
-import createSavingsAccount from "./api/v1/handlers/account/savings/createSavingsAccount.js";
-import savingsAccountPlans from "./api/v1/handlers/account/savings/savingsAccountPlans.js";
+import listSavingsAccounts from "./api/v1/handlers/account/savings/list.js";
+import createSavingsAccount from "./api/v1/handlers/account/savings/create.js";
+import savingsAccountPlans from "./api/v1/handlers/account/savings/plans.js";
 
 const app = express();
 
