@@ -18,7 +18,7 @@ import createLoanRequest from "./api/v1/handlers/loan/request/create.js";
 import details from "./api/v1/handlers/loan/details.js";
 import selfApply from "./api/v1/handlers/loan/selfapply.js";
 import list from "./api/v1/handlers/loan/list.js";
-import process from "./api/v1/handlers/loan/process.js";
+import processLoanRequest from "./api/v1/handlers/loan/request/process.js";
 
 const app = express();
 
@@ -37,7 +37,7 @@ const api = new OpenAPIBackend({
     createLoanRequest,
     details,
     list,
-    process,
+    processLoanRequest,
     selfApply,
     validationFail,
     notFound,

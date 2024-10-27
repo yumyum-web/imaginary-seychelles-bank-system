@@ -247,11 +247,10 @@ const apiDoc: OpenAPIV3.Document = {
         },
       },
     },
-    "/loans/process": {
-      // New endpoint for accepting or rejecting a loan request
+    "/loan/request/process": {
       post: {
         summary: "Accept or reject a loan request",
-        operationId: "process",
+        operationId: "processLoanRequest",
         requestBody: {
           required: true,
           content: {
@@ -259,22 +258,24 @@ const apiDoc: OpenAPIV3.Document = {
               schema: {
                 type: "object",
                 properties: {
-                  managerId: {
-                    type: "integer",
-                  },
                   requestId: {
                     type: "integer",
                   },
                   action: {
                     type: "string",
-                    enum: ["Accept", "Reject"], // Valid values for action
+                    enum: ["Accept", "Reject"],
                   },
                 },
-                required: ["managerId", "requestId", "action"],
+                required: ["requestId", "action"],
               },
             },
           },
         },
+        security: [
+          {
+            jwt: ["manager"],
+          },
+        ],
         responses: {
           200: {
             description: "Loan request processed successfully",
@@ -286,14 +287,8 @@ const apiDoc: OpenAPIV3.Document = {
                     message: {
                       type: "string",
                     },
-                    requestId: {
-                      type: "integer",
-                    },
-                    action: {
-                      type: "string",
-                    },
                   },
-                  required: ["message", "requestId", "action"],
+                  required: ["message"],
                 },
               },
             },
