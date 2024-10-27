@@ -31,7 +31,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Transactions } from "./types";
+import { Transactions } from "../types";
 
 //sample data
 const data: Transactions[] = [
@@ -225,7 +225,7 @@ export const columns: ColumnDef<Transactions>[] = [
   //   },
 ];
 
-export function TotalTransactions() {
+export function TransactionHistory() {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
@@ -252,16 +252,6 @@ export function TotalTransactions() {
 
   return (
     <>
-      <div className="mb-2 flex items-center justify-between space-y-2">
-        <div>
-          <h2 className="text-2xl font-bold tracking-tight">
-            Total Transactions
-          </h2>
-          <p className="text-muted-foreground">
-            Branch wise total transaction report
-          </p>
-        </div>
-      </div>
       <div className="-mx-4 flex-1 overflow-auto px-4 py-1 lg:flex-row lg:space-x-12 lg:space-y-0">
         <div className="w-full">
           <div className="flex items-center py-4">
