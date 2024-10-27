@@ -15,6 +15,8 @@ import unauthorizedHandler from "./api/v1/handlers/unauthorizedHandler.js";
 import jwtHandler from "./api/v1/securityHandlers/jwtHandler.js";
 import login from "./api/v1/handlers/auth/login.js";
 import profileRoutes from './routes/profileRoutes.js'; // Import the profile routes
+import organizationRoutes from './routes/organizationRoutes.js'; // Import organization routes
+import employeeRoutes from './routes/employeeRoutes.js'; // Import employee routes
 
 const app = express();
 
@@ -24,6 +26,15 @@ app.use(helmet());
 app.use(morgan("dev"));
 app.use(compression());
 app.use(express.json());
+
+// Use the profile routes
+app.use("/api/v1", profileRoutes); // Adjust the prefix as necessary
+
+// Use the organization routes
+app.use("/api/v1", organizationRoutes); // Adjust the prefix as necessary
+
+// Use the employee routes
+app.use("/api/v1", employeeRoutes); // Adjust the prefix as necessary
 
 const api = new OpenAPIBackend({
   definition: v1ApiDoc,
