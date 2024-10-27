@@ -12,7 +12,7 @@ const jwtHandler: Handler = (c) => {
   const token = authHeader.replace("Bearer ", "");
   const user = decodeJwt(token);
   if (
-    user.levels.some((l) =>
+    !user.levels.some((l) =>
       isLevelSufficientForSecurityRequirements(l, c.operation.security),
     )
   ) {
