@@ -4,7 +4,8 @@ import { Layout } from "@/layouts/layout";
 import { Button } from "@/components/custom/button";
 import Nav from "./nav";
 import { cn } from "@/lib/utils";
-import { managerLinks } from "@/routes/navlinks";
+import { managerLinks, employeeLinks, NavLink } from "@/routes/navlinks";
+import { useUser } from "@/contexts/useUser";
 
 interface SidebarProps extends React.HTMLAttributes<HTMLElement> {
   isCollapsed: boolean;
@@ -16,6 +17,7 @@ export default function Sidebar({
   isCollapsed,
   setIsCollapsed,
 }: SidebarProps) {
+  const { user, userLevels } = useUser(); // Use userLevels instead of user.type
   const [navOpened, setNavOpened] = useState(false);
 
   /* Make body not scrollable when navBar is opened */
@@ -27,17 +29,41 @@ export default function Sidebar({
     }
   }, [navOpened]);
 
+  // Determine which navigation links to display based on userLevels
+  let links: NavLink[] = [];
+
+  if (userLevels?.includes("manager")) {
+    links = [...links, ...managerLinks];
+  }
+
+  if (userLevels?.includes("employee")) {
+    links = [...links, ...employeeLinks];
+  }
+
+  // Handle the case when userLevels is null or empty
+  if (!userLevels || userLevels.length === 0) {
+    // You can redirect to sign-in or show default links
+    // For this example, we'll redirect to sign-in
+    // Note: Ensure that your routing logic handles this
+    // You might need to use useNavigate here if necessary
+    links = []; // Or provide default links
+  }
+
   return (
     <aside
       className={cn(
-        `fixed left-0 right-0 top-0 z-50 w-full border-r-2 border-r-muted transition-[width] md:bottom-0 md:right-auto md:h-svh ${isCollapsed ? "md:w-14" : "md:w-64"}`,
+        `fixed left-0 right-0 top-0 z-50 w-full border-r-2 border-r-muted transition-[width] md:bottom-0 md:right-auto md:h-svh ${
+          isCollapsed ? "md:w-14" : "md:w-64"
+        }`,
         className,
       )}
     >
       {/* Overlay in mobile */}
       <div
         onClick={() => setNavOpened(false)}
-        className={`absolute inset-0 transition-[opacity] delay-100 duration-700 ${navOpened ? "h-svh opacity-50" : "h-0 opacity-0"} w-full bg-black md:hidden`}
+        className={`absolute inset-0 transition-[opacity] delay-100 duration-700 ${
+          navOpened ? "h-svh opacity-50" : "h-0 opacity-0"
+        } w-full bg-black md:hidden`}
       />
 
       <Layout fixed className={navOpened ? "h-svh" : ""}>
@@ -50,7 +76,9 @@ export default function Sidebar({
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 256 256"
-              className={`transition-all ${isCollapsed ? "h-6 w-6" : "h-8 w-8"}`}
+              className={`transition-all ${
+                isCollapsed ? "h-6 w-6" : "h-8 w-8"
+              }`}
             >
               <rect width="256" height="256" fill="none"></rect>
               <line
@@ -78,10 +106,12 @@ export default function Sidebar({
               <span className="sr-only">Website Name</span>
             </svg>
             <div
-              className={`flex flex-col justify-end truncate ${isCollapsed ? "invisible w-0" : "visible w-auto"}`}
+              className={`flex flex-col justify-end truncate ${
+                isCollapsed ? "invisible w-0" : "visible w-auto"
+              }`}
             >
-              <span className="font-medium">Manager Dashboard</span>
-              <span className="text-xs">Moratuwa Branch</span>
+              <span className="font-medium">{user?.type} Dashboard</span>
+              <span className="text-xs">{user?.branch} Branch</span>
             </div>
           </div>
 
@@ -102,10 +132,12 @@ export default function Sidebar({
         {/* Navigation links */}
         <Nav
           id="sidebar-menu"
-          className={`z-40 h-full flex-1 overflow-auto ${navOpened ? "max-h-screen" : "max-h-0 py-0 md:max-h-screen md:py-2"}`}
+          className={`z-40 h-full flex-1 overflow-auto ${
+            navOpened ? "max-h-screen" : "max-h-0 py-0 md:max-h-screen md:py-2"
+          }`}
           closeNav={() => setNavOpened(false)}
           isCollapsed={isCollapsed}
-          links={managerLinks}
+          links={links}
         />
 
         {/* Scrollbar width toggle button */}

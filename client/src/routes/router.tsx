@@ -1,67 +1,74 @@
-import { createBrowserRouter } from "react-router-dom";
+import { RouteObject } from "react-router-dom";
 import GeneralError from "@/pages/errors/generalError";
 import NotFoundError from "@/pages/errors/notFoundError";
 import MaintenanceError from "@/pages/errors/maintenanceError";
 import UnauthorisedError from "@/pages/errors/unauthorisedError";
 import SignIn from "@/pages/auth/signIn";
-// import ForgotPassword from './pages/auth/forgot-password'
 import Main from "@/layouts/main";
 import Manager from "@/pages/manager/index";
 import { LateLoanInstallments } from "@/pages/manager/lateLoanInstallments";
 import { TotalTransactions } from "@/pages/manager/totalTransactions";
 import { LoanRequests } from "@/pages/manager/loanRequests";
-// import Dashboard from './pages/dashboard'
-// import Tasks from './pages/tasks'
-// import Chats from './pages/chats'
-// import Apps from './pages/apps'
-// import ComingSoon from './components/coming-soon'
-// import ExtraComponents from './pages/extra-components'
-// import Settings from './pages/settings'
-// import Profile from './pages/settings/profile'
-// import Account from './pages/settings/account'
-// import Appearance from './pages/settings/appearance'
-// import Notifications from './pages/settings/notifications'
-// import Display from './pages/settings/display'
-// import ErrorExample from './pages/settings/error-example'
+import Employee from "@/pages/employee";
+import { CreateSavingsAccount } from "@/pages/employee/createSavingsAccount";
+import { CreateCheckingsAccount } from "@/pages/employee/createCheckingAccount";
+import ProtectedRoute from "./protectedRoute";
+import ComingSoon from "@/components/comingSoon";
+import { CreateLoanRequest } from "@/pages/employee/createLoanRequest";
+import { CreateFixedDeposit } from "@/pages/employee/createFixedDesposit";
 
-const router = createBrowserRouter([
-  // Auth routes
-  { path: "/sign-in", Component: SignIn },
-
-  // Main routes
+const routes: RouteObject[] = [
+  { path: "/sign-in", element: <SignIn /> },
   {
     path: "/",
-    Component: Main,
+    element: <Main />,
     errorElement: <GeneralError />,
     children: [
-      { index: true, Component: Manager },
       {
         path: "manager",
-        Component: Manager,
-        errorElement: <GeneralError />,
+        element: (
+          <ProtectedRoute requiredLevels={["manager"]}>
+            <Manager />
+          </ProtectedRoute>
+        ),
         children: [
-          { index: true, Component: LateLoanInstallments },
-          { path: "late-loan-installments", Component: LateLoanInstallments },
-          { path: "total-transactions", Component: TotalTransactions },
-          { path: "loan-requests", Component: LoanRequests },
-          //   {
-          //     path: 'error-example',
-          //     Component: ErrorExample,
-          //     errorElement: <GeneralError className="h-[50svh]" minimal />,
-          //   },
+          { index: true, element: <LateLoanInstallments /> },
+          { path: "late-loan-installments", element: <LateLoanInstallments /> },
+          { path: "total-transactions", element: <TotalTransactions /> },
+          { path: "loan-requests", element: <LoanRequests /> },
+        ],
+      },
+      {
+        path: "employee",
+        element: (
+          <ProtectedRoute requiredLevels={["employee"]}>
+            <Employee />
+          </ProtectedRoute>
+        ),
+        children: [
+          { index: true, element: <ComingSoon /> },
+          { path: "create-savings-account", element: <CreateSavingsAccount /> },
+          {
+            path: "create-checkings-account",
+            element: <CreateCheckingsAccount />,
+          },
+          {
+            path: "create-fixed-deposit",
+            element: <CreateFixedDeposit />,
+          },
+          {
+            path: "request-loans",
+            element: <CreateLoanRequest />,
+          },
         ],
       },
     ],
   },
+  { path: "/500", element: <GeneralError /> },
+  { path: "/404", element: <NotFoundError /> },
+  { path: "/503", element: <MaintenanceError /> },
+  { path: "/401", element: <UnauthorisedError /> },
+  { path: "*", element: <NotFoundError /> },
+];
 
-  // Error routes
-  { path: "/500", Component: GeneralError },
-  { path: "/404", Component: NotFoundError },
-  { path: "/503", Component: MaintenanceError },
-  { path: "/401", Component: UnauthorisedError },
-
-  // Fallback 404 route
-  { path: "*", Component: NotFoundError },
-]);
-
-export default router;
+export default routes;
