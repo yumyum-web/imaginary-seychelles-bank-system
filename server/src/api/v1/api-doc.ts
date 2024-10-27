@@ -403,10 +403,15 @@ const apiDoc: OpenAPIV3.Document = {
         },
       },
     },
-    "/loan/list": {
+    "/loan/request/list": {
       get: {
-        summary: "Get all loan requests",
-        operationId: "list",
+        summary: "Get customer loan requests or branch loan requests",
+        operationId: "listLoanRequests",
+        security: [
+          {
+            jwt: ["customer", "manager"],
+          },
+        ],
         responses: {
           200: {
             description: "Successful retrieval of loan requests",
@@ -415,63 +420,8 @@ const apiDoc: OpenAPIV3.Document = {
                 schema: {
                   type: "array",
                   items: {
-                    type: "object",
-                    properties: {
-                      requestId: {
-                        type: "number",
-                      },
-                      employeeId: {
-                        type: "number",
-                      },
-                      loanType: {
-                        type: "string",
-                        enum: ["Business", "Personal"],
-                      },
-                      loanAmount: {
-                        type: "number",
-                        format: "float",
-                      },
-                      purpose: {
-                        type: "string",
-                      },
-                      status: {
-                        type: "string",
-                        enum: ["Pending", "Approved", "Rejected"],
-                      },
-                      timePeriod: {
-                        type: "number",
-                      },
-                      createdAt: {
-                        type: "string",
-                      },
-                    },
-                    required: [
-                      "requestId",
-                      "employeeId",
-                      "loanType",
-                      "loanAmount",
-                      "purpose",
-                      "status",
-                      "timePeriod",
-                      "createdAt",
-                    ],
+                    $ref: "#/components/schemas/LoanRequest",
                   },
-                },
-              },
-            },
-          },
-          404: {
-            description: "No loan requests found",
-            content: {
-              "application/json": {
-                schema: {
-                  type: "object",
-                  properties: {
-                    message: {
-                      type: "string",
-                    },
-                  },
-                  required: ["message"],
                 },
               },
             },
@@ -496,7 +446,6 @@ const apiDoc: OpenAPIV3.Document = {
       },
     },
   },
-
   components: {
     responses: {
       Unauthorized: {
@@ -543,6 +492,48 @@ const apiDoc: OpenAPIV3.Document = {
       },
     },
     schemas: {
+      LoanRequest: {
+        type: "object",
+        properties: {
+          id: {
+            type: "number",
+          },
+          employeeId: {
+            type: "number",
+          },
+          customerId: {
+            type: "number",
+          },
+          type: {
+            type: "string",
+            enum: ["Business", "Personal"],
+          },
+          amount: {
+            type: "number",
+            format: "float",
+          },
+          purpose: {
+            type: "string",
+          },
+          status: {
+            type: "string",
+            enum: ["Pending", "Approved", "Rejected"],
+          },
+          timePeriod: {
+            type: "number",
+          },
+        },
+        required: [
+          "requestId",
+          "employeeId",
+          "customerId",
+          "loanType",
+          "loanAmount",
+          "purpose",
+          "status",
+          "timePeriod",
+        ],
+      },
       ValidationError: {
         type: "object",
         properties: {
