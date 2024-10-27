@@ -14,6 +14,7 @@ import notImplemented from "./api/v1/handlers/notImplemented.js";
 import unauthorizedHandler from "./api/v1/handlers/unauthorizedHandler.js";
 import jwtHandler from "./api/v1/securityHandlers/jwtHandler.js";
 import login from "./api/v1/handlers/auth/login.js";
+import listSavingsAccounts from "./api/v1/handlers/account/savings/listSavingsAccounts.js";
 
 const app = express();
 
@@ -29,6 +30,7 @@ const api = new OpenAPIBackend({
   strict: true,
   handlers: {
     login,
+    listSavingsAccounts,
     validationFail,
     notFound,
     methodNotAllowed,

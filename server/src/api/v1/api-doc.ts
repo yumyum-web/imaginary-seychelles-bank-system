@@ -80,9 +80,76 @@ const apiDoc: OpenAPIV3.Document = {
         },
       },
     },
+    "/account/savings/list": {
+      get: {
+        summary:
+          "List savings accounts of a customer. Employees can list any customer's accounts. Customers can only list their own accounts.",
+        operationId: "listSavingsAccounts",
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                properties: {
+                  customerId: {
+                    type: "number",
+                  },
+                },
+              },
+            },
+          },
+        },
+        security: [
+          {
+            jwt: ["customer", "employee"],
+          },
+        ],
+        responses: {
+          200: {
+            description: "Successful operation",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "array",
+                  items: {
+                    $ref: "#/components/schemas/SavingsAccount",
+                  },
+                },
+              },
+            },
+          },
+          400: {
+            $ref: "#/components/responses/ValidationFail",
+          },
+          401: {
+            $ref: "#/components/responses/Unauthorized",
+          },
+        },
+      },
+    },
   },
   components: {
     responses: {
+      Forbidden: {
+        description: "403 Forbidden",
+        content: {
+          "application/json": {
+            schema: {
+              type: "object",
+              properties: {
+                status: {
+                  type: "integer",
+                },
+                err: {
+                  type: "string",
+                },
+              },
+              required: ["status", "err"],
+            },
+          },
+        },
+      },
       Unauthorized: {
         description: "401 Unauthorized",
         content: {
@@ -127,6 +194,27 @@ const apiDoc: OpenAPIV3.Document = {
       },
     },
     schemas: {
+      SavingsAccount: {
+        type: "object",
+        properties: {
+          id: { type: "integer" },
+          balance: { type: "string", maxLength: 10 },
+          noOfWithdrawals: { type: "integer" },
+          planId: { type: "integer" },
+          planName: { type: "string", maxLength: 30 },
+          branchId: { type: "integer" },
+          branchName: { type: "string" },
+        },
+        required: [
+          "id",
+          "balance",
+          "noOfWithdrawals",
+          "planId",
+          "planName",
+          "branchId",
+          "branchName",
+        ],
+      },
       ValidationError: {
         type: "object",
         properties: {
@@ -141,7 +229,6 @@ const apiDoc: OpenAPIV3.Document = {
           },
         },
         additionalProperties: true,
-        required: ["keyword", "params"],
       },
     },
     securitySchemes: {
