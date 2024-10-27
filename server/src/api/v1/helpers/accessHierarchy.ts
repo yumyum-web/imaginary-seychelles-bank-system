@@ -34,17 +34,24 @@ const AccessHierarchy: AccessLevel = {
 const isLevelSufficientForLevel = (
   userLevel: string,
   requiredLevel: string,
+  hierarchy: AccessLevel = AccessHierarchy,
 ): boolean => {
+  const isDescendant = (level: AccessLevel, name: string): boolean => {
+    if (level.name === name) {
+      return true;
+    }
+    return level.children?.some((l) => isDescendant(l, name)) || false;
+  };
+
   if (userLevel === requiredLevel) {
     return true;
   }
-  const level = AccessHierarchy.children?.find((l) => l.name === userLevel);
-  if (!level) {
-    return false;
+  if (hierarchy.name === requiredLevel) {
+    return isDescendant(hierarchy, userLevel);
   }
   return (
-    level.children?.some((l) =>
-      isLevelSufficientForLevel(l.name, requiredLevel),
+    hierarchy.children?.some((l) =>
+      isLevelSufficientForLevel(userLevel, requiredLevel, l),
     ) || false
   );
 };
