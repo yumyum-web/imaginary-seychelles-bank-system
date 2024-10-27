@@ -13,6 +13,9 @@ import Employee from "@/pages/employee";
 import { CreateSavingsAccount } from "@/pages/employee/createSavingsAccount";
 import { CreateCheckingsAccount } from "@/pages/employee/createCheckingAccount";
 import ProtectedRoute from "./protectedRoute";
+import ComingSoon from "@/components/comingSoon";
+import { CreateLoanRequest } from "@/pages/employee/createLoanRequest";
+import { CreateFixedDeposit } from "@/pages/employee/createFixedDesposit";
 
 const routes: RouteObject[] = [
   { path: "/sign-in", element: <SignIn /> },
@@ -43,11 +46,19 @@ const routes: RouteObject[] = [
           </ProtectedRoute>
         ),
         children: [
-          { index: true, element: <CreateSavingsAccount /> },
+          { index: true, element: <ComingSoon /> },
           { path: "create-savings-account", element: <CreateSavingsAccount /> },
           {
             path: "create-checkings-account",
             element: <CreateCheckingsAccount />,
+          },
+          {
+            path: "create-fixed-deposit",
+            element: <CreateFixedDeposit />,
+          },
+          {
+            path: "request-loans",
+            element: <CreateLoanRequest />,
           },
         ],
       },
