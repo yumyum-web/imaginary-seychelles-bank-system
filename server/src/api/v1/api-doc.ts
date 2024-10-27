@@ -150,6 +150,41 @@ const apiDoc: OpenAPIV3.Document = {
         },
       },
     },
+    "/profile/employee": {
+      get: {
+        summary: "Get employee profile",
+        operationId: "employeeProfile",
+        security: [
+          {
+            jwt: ["employee"],
+          },
+        ],
+        responses: {
+          200: {
+            description: "Employee profile retrieved successfully",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/Employee" },
+              },
+            },
+          },
+          500: {
+            description: "Failed to retrieve employee profile",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    message: { type: "string" },
+                  },
+                  required: ["message"],
+                },
+              },
+            },
+          },
+        },
+      },
+    },
     "/loan/selfApply": {
       post: {
         summary: "Self-apply for a loan",
@@ -519,6 +554,33 @@ const apiDoc: OpenAPIV3.Document = {
       },
     },
     schemas: {
+      Employee: {
+        type: "object",
+        properties: {
+          id: { type: "number" },
+          NIC: { type: "string" },
+          firstName: { type: "string" },
+          lastName: { type: "string" },
+          address: { type: "string" },
+          phoneNumber: { type: "number" },
+          dateOfBirth: { type: "string" },
+          position: { type: "string" },
+          branchId: { type: "number" },
+          branchName: { type: "string" },
+        },
+        required: [
+          "id",
+          "NIC",
+          "firstName",
+          "lastName",
+          "address",
+          "phoneNumber",
+          "dateOfBirth",
+          "position",
+          "branchId",
+          "branchName",
+        ],
+      },
       Loan: {
         type: "object",
         properties: {

@@ -21,6 +21,7 @@ import listLoanRequests from "./api/v1/handlers/loan/request/list.js";
 import processLoanRequest from "./api/v1/handlers/loan/request/process.js";
 import userProfile from "./api/v1/handlers/profile/user.js";
 import organizationProfile from "./api/v1/handlers/profile/organization.js";
+import employeeProfile from "./api/v1/handlers/profile/employee.js";
 
 const app = express();
 
@@ -38,6 +39,7 @@ const api = new OpenAPIBackend({
     login,
     userProfile,
     organizationProfile,
+    employeeProfile,
     createLoanRequest,
     listLoans,
     listLoanRequests,
