@@ -77,7 +77,7 @@ const apiDoc: OpenAPIV3.Document = {
         },
       },
     },
-    "/loans/selfapply": {
+    "/loan/selfapply": {
       // New Endpoint
       post: {
         summary: "Self-apply for a loan",
@@ -166,7 +166,7 @@ const apiDoc: OpenAPIV3.Document = {
       },
     },
 
-    "/loans/create": {
+    "/loan/create": {
       // New Endpoint
       post: {
         summary: "Create a loan request",
@@ -273,7 +273,7 @@ const apiDoc: OpenAPIV3.Document = {
         },
       },
     },
-    "/loans/process": {
+    "/loan/process": {
       // New endpoint for accepting or rejecting a loan request
       post: {
         summary: "Accept or reject a loan request",
@@ -346,7 +346,7 @@ const apiDoc: OpenAPIV3.Document = {
         },
       },
     },
-    "/loans/details": {
+    "/loan/details": {
       get: {
         summary: "Retrieve loan details for a customer",
         operationId: "details",
