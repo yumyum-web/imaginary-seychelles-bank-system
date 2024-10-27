@@ -15,7 +15,7 @@ import unauthorizedHandler from "./api/v1/handlers/unauthorizedHandler.js";
 import jwtHandler from "./api/v1/securityHandlers/jwtHandler.js";
 import login from "./api/v1/handlers/auth/login.js";
 import createLoanRequest from "./api/v1/handlers/loan/request/create.js";
-import details from "./api/v1/handlers/loan/details.js";
+import listLoans from "./api/v1/handlers/loan/list.js";
 import selfApply from "./api/v1/handlers/loan/selfapply.js";
 import listLoanRequests from "./api/v1/handlers/loan/request/list.js";
 import processLoanRequest from "./api/v1/handlers/loan/request/process.js";
@@ -35,7 +35,7 @@ const api = new OpenAPIBackend({
   handlers: {
     login,
     createLoanRequest,
-    details,
+    listLoans,
     listLoanRequests,
     processLoanRequest,
     selfApply,

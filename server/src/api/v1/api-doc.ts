@@ -315,79 +315,31 @@ const apiDoc: OpenAPIV3.Document = {
         },
       },
     },
-    "/loans/details": {
+    "/loan/list": {
       get: {
-        summary: "Retrieve loan details for a customer",
-        operationId: "details",
-        parameters: [
+        summary: "Retrieve loan list for the customer.",
+        operationId: "listLoans",
+        security: [
           {
-            name: "loanId",
-            in: "query",
-            required: true,
-            schema: {
-              type: "integer",
-            },
-            description: "The unique ID of the loan",
-          },
-          {
-            name: "customerId",
-            in: "query",
-            required: true,
-            schema: {
-              type: "integer",
-            },
-            description: "The unique ID of the customer",
+            jwt: ["customer"],
           },
         ],
         responses: {
           200: {
-            description: "Loan details retrieved successfully",
+            description: "Loan list retrieved successfully",
             content: {
               "application/json": {
                 schema: {
-                  type: "object",
-                  properties: {
-                    loanId: { type: "integer" },
-                    loanType: { type: "string" },
-                    amount: { type: "number", format: "float" },
-                    purpose: { type: "string" },
-                    interestRate: { type: "number", format: "float" },
-                    startDate: { type: "string" },
-                    endDate: { type: "string" },
-                    status: { type: "string" },
-                    timePeriod: { type: "integer" },
+                  type: "array",
+                  items: {
+                    $ref: "#/components/schemas/Loan",
                   },
-                  required: [
-                    "loanId",
-                    "loanType",
-                    "amount",
-                    "purpose",
-                    "interestRate",
-                    "startDate",
-                    "endDate",
-                    "status",
-                    "timePeriod",
-                  ],
-                },
-              },
-            },
-          },
-          404: {
-            description: "Loan not found or unauthorized access",
-            content: {
-              "application/json": {
-                schema: {
-                  type: "object",
-                  properties: {
-                    message: { type: "string" },
-                  },
-                  required: ["message"],
                 },
               },
             },
           },
           500: {
-            description: "Failed to retrieve loan details",
+            description: "Failed to retrieve loan list",
             content: {
               "application/json": {
                 schema: {
@@ -492,6 +444,28 @@ const apiDoc: OpenAPIV3.Document = {
       },
     },
     schemas: {
+      Loan: {
+        type: "object",
+        properties: {
+          loanId: { type: "integer" },
+          loanType: { type: "string" },
+          amount: { type: "number", format: "float" },
+          interestRate: { type: "number", format: "float" },
+          purpose: { type: "string" },
+          requestId: { type: "integer" },
+          startDate: { type: "string" },
+          endDate: { type: "string" },
+        },
+        required: [
+          "loanId",
+          "loanType",
+          "amount",
+          "interestRate",
+          "purpose",
+          "startDate",
+          "endDate",
+        ],
+      },
       LoanRequest: {
         type: "object",
         properties: {
