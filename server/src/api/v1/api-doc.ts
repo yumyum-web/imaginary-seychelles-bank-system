@@ -238,6 +238,74 @@ const apiDoc: OpenAPIV3.Document = {
         },
       },
     },
+    "/account/checking/create": {
+      post: {
+        summary: "Create a checking account",
+        operationId: "createCheckingAccount",
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                properties: {
+                  customerId: {
+                    type: "number",
+                  },
+                  initialDeposit: {
+                    type: "number",
+                    format: "float",
+                  },
+                },
+                required: ["customerId", "initialDeposit"],
+              },
+            },
+          },
+        },
+        security: [
+          {
+            jwt: ["employee"],
+          },
+        ],
+        responses: {
+          201: {
+            description: "Checking account created successfully",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    message: {
+                      type: "string",
+                    },
+                  },
+                  required: ["message"],
+                },
+              },
+            },
+          },
+          400: {
+            $ref: "#/components/responses/ValidationFail",
+          },
+          500: {
+            description: "Failed to create checking account",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    message: {
+                      type: "string",
+                    },
+                  },
+                  required: ["message"],
+                },
+              },
+            },
+          },
+        },
+      },
+    },
     "/loan/selfApply": {
       post: {
         summary: "Self-apply for a loan",
