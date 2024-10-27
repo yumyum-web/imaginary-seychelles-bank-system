@@ -25,6 +25,7 @@ import employeeProfile from "./api/v1/handlers/profile/employee.js";
 import listSavingsAccounts from "./api/v1/handlers/account/savings/list.js";
 import createSavingsAccount from "./api/v1/handlers/account/savings/create.js";
 import savingsAccountPlans from "./api/v1/handlers/account/savings/plans.js";
+import listCheckingAccounts from "./api/v1/handlers/account/checking/list.js";
 
 const app = express();
 
@@ -46,6 +47,7 @@ const api = new OpenAPIBackend({
     listSavingsAccounts,
     createSavingsAccount,
     savingsAccountPlans,
+    listCheckingAccounts,
     createLoanRequest,
     listLoans,
     listLoanRequests,

@@ -185,6 +185,59 @@ const apiDoc: OpenAPIV3.Document = {
         },
       },
     },
+    "/account/checking/list": {
+      get: {
+        summary: "List checking accounts",
+        operationId: "listCheckingAccounts",
+        security: [
+          {
+            jwt: ["customer", "employee"],
+          },
+        ],
+        responses: {
+          200: {
+            description: "Checking accounts retrieved successfully",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "array",
+                  items: {
+                    type: "object",
+                    properties: {
+                      id: { type: "number" },
+                      balance: { type: "number", format: "float" },
+                      branchId: { type: "number" },
+                      branchName: { type: "string" },
+                    },
+                    required: ["id", "balance", "branchId", "branchName"],
+                  },
+                },
+              },
+            },
+          },
+          403: {
+            $ref: "#/components/responses/Forbidden",
+          },
+          400: {
+            $ref: "#/components/responses/ValidationFail",
+          },
+          500: {
+            description: "Failed to retrieve checking accounts",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    message: { type: "string" },
+                  },
+                  required: ["message"],
+                },
+              },
+            },
+          },
+        },
+      },
+    },
     "/loan/selfApply": {
       post: {
         summary: "Self-apply for a loan",
