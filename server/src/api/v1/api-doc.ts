@@ -555,6 +555,77 @@ const apiDoc: OpenAPIV3.Document = {
         },
       },
     },
+    "/account/savings/create": {
+      post: {
+        summary: "Create a savings account",
+        operationId: "createSavingsAccount",
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                properties: {
+                  customerId: {
+                    type: "number",
+                  },
+                  planId: {
+                    type: "number",
+                  },
+                  initialDeposit: {
+                    type: "number",
+                    format: "float",
+                  },
+                },
+                required: ["customerId", "planId", "initialDeposit"],
+              },
+            },
+          },
+        },
+        security: [
+          {
+            jwt: ["employee"],
+          },
+        ],
+        responses: {
+          201: {
+            description: "Savings account created successfully",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    message: {
+                      type: "string",
+                    },
+                  },
+                  required: ["message"],
+                },
+              },
+            },
+          },
+          400: {
+            $ref: "#/components/responses/ValidationFail",
+          },
+          500: {
+            description: "Failed to create savings account",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    message: {
+                      type: "string",
+                    },
+                  },
+                  required: ["message"],
+                },
+              },
+            },
+          },
+        },
+      },
+    },
   },
   components: {
     responses: {
