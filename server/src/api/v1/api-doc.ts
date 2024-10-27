@@ -80,6 +80,41 @@ const apiDoc: OpenAPIV3.Document = {
         },
       },
     },
+    "/profile/user": {
+      get: {
+        summary: "Get user profile",
+        operationId: "userProfile",
+        security: [
+          {
+            jwt: ["user"],
+          },
+        ],
+        responses: {
+          200: {
+            description: "User profile retrieved successfully",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/User" },
+              },
+            },
+          },
+          500: {
+            description: "Failed to retrieve user profile",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    message: { type: "string" },
+                  },
+                  required: ["message"],
+                },
+              },
+            },
+          },
+        },
+      },
+    },
     "/loan/selfApply": {
       post: {
         summary: "Self-apply for a loan",
@@ -511,6 +546,26 @@ const apiDoc: OpenAPIV3.Document = {
           "purpose",
           "status",
           "timePeriod",
+        ],
+      },
+      User: {
+        type: "object",
+        properties: {
+          id: { type: "number" },
+          NIC: { type: "string" },
+          firstName: { type: "string" },
+          lastName: { type: "string" },
+          address: { type: "string" },
+          phoneNumber: { type: "number" },
+          dateOfBirth: { type: "string" },
+        },
+        required: [
+          "NIC",
+          "firstName",
+          "lastName",
+          "address",
+          "phoneNumber",
+          "dateOfBirth",
         ],
       },
       ValidationError: {
