@@ -115,6 +115,41 @@ const apiDoc: OpenAPIV3.Document = {
         },
       },
     },
+    "/profile/organization": {
+      get: {
+        summary: "Get organization profile",
+        operationId: "organizationProfile",
+        security: [
+          {
+            jwt: ["organization"],
+          },
+        ],
+        responses: {
+          200: {
+            description: "Organization profile retrieved successfully",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/Organization" },
+              },
+            },
+          },
+          500: {
+            description: "Failed to retrieve organization profile",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    message: { type: "string" },
+                  },
+                  required: ["message"],
+                },
+              },
+            },
+          },
+        },
+      },
+    },
     "/loan/selfApply": {
       post: {
         summary: "Self-apply for a loan",
@@ -546,6 +581,23 @@ const apiDoc: OpenAPIV3.Document = {
           "purpose",
           "status",
           "timePeriod",
+        ],
+      },
+      Organization: {
+        type: "object",
+        properties: {
+          id: { type: "number" },
+          type: { type: "string" },
+          address: { type: "string" },
+          phoneNumber: { type: "number" },
+          dateOfIncorporation: { type: "string" },
+        },
+        required: [
+          "id",
+          "type",
+          "address",
+          "phoneNumber",
+          "dateOfIncorporation",
         ],
       },
       User: {
