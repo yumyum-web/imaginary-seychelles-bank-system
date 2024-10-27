@@ -80,6 +80,328 @@ const apiDoc: OpenAPIV3.Document = {
         },
       },
     },
+    "/loan/selfApply": {
+      post: {
+        summary: "Self-apply for a loan",
+        operationId: "selfApply",
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                properties: {
+                  FDId: {
+                    type: "integer",
+                  },
+                  savingsAccountId: {
+                    type: "integer",
+                  },
+                  loanType: {
+                    type: "string",
+                    enum: ["Business", "Personal"],
+                  },
+                  amount: {
+                    type: "number",
+                    format: "float",
+                  },
+                  purpose: {
+                    type: "string",
+                  },
+                  timePeriod: {
+                    type: "integer",
+                  },
+                },
+                required: [
+                  "FDId",
+                  "savingsAccountId",
+                  "loanType",
+                  "amount",
+                  "purpose",
+                  "timePeriod",
+                ],
+              },
+            },
+          },
+        },
+        security: [
+          {
+            jwt: ["customer"],
+          },
+        ],
+        responses: {
+          201: {
+            description: "Loan application successful",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    message: {
+                      type: "string",
+                    },
+                  },
+                  required: ["message"],
+                },
+              },
+            },
+          },
+          400: {
+            $ref: "#/components/responses/ValidationFail",
+          },
+          500: {
+            description: "Failed to apply for loan",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    message: {
+                      type: "string",
+                    },
+                  },
+                  required: ["message"],
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+    "/loan/request/create": {
+      post: {
+        summary: "Create a loan request",
+        operationId: "createLoanRequest",
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                properties: {
+                  loanType: {
+                    type: "string",
+                    enum: ["Business", "Personal"],
+                  },
+                  loanAmount: {
+                    type: "number",
+                    format: "float",
+                  },
+                  purpose: {
+                    type: "string",
+                  },
+                  accountId: {
+                    type: "integer",
+                  },
+                  timePeriod: {
+                    type: "integer",
+                  },
+                },
+                required: [
+                  "loanType",
+                  "loanAmount",
+                  "purpose",
+                  "accountId",
+                  "timePeriod",
+                ],
+              },
+            },
+          },
+        },
+        security: [
+          {
+            jwt: ["employee"],
+          },
+        ],
+        responses: {
+          201: {
+            description: "Loan request created successfully",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    message: {
+                      type: "string",
+                    },
+                  },
+                  required: ["message"],
+                },
+              },
+            },
+          },
+          400: {
+            $ref: "#/components/responses/ValidationFail",
+          },
+          500: {
+            description: "Failed to create loan request",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    message: {
+                      type: "string",
+                    },
+                  },
+                  required: ["message"],
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+    "/loan/request/process": {
+      post: {
+        summary: "Accept or reject a loan request",
+        operationId: "processLoanRequest",
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                properties: {
+                  requestId: {
+                    type: "integer",
+                  },
+                  action: {
+                    type: "string",
+                    enum: ["Accept", "Reject"],
+                  },
+                },
+                required: ["requestId", "action"],
+              },
+            },
+          },
+        },
+        security: [
+          {
+            jwt: ["manager"],
+          },
+        ],
+        responses: {
+          200: {
+            description: "Loan request processed successfully",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    message: {
+                      type: "string",
+                    },
+                  },
+                  required: ["message"],
+                },
+              },
+            },
+          },
+          400: {
+            $ref: "#/components/responses/ValidationFail",
+          },
+          500: {
+            description: "Failed to process loan request",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    message: {
+                      type: "string",
+                    },
+                  },
+                  required: ["message"],
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+    "/loan/list": {
+      get: {
+        summary: "Retrieve loan list for the customer.",
+        operationId: "listLoans",
+        security: [
+          {
+            jwt: ["customer"],
+          },
+        ],
+        responses: {
+          200: {
+            description: "Loan list retrieved successfully",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "array",
+                  items: {
+                    $ref: "#/components/schemas/Loan",
+                  },
+                },
+              },
+            },
+          },
+          500: {
+            description: "Failed to retrieve loan list",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    message: { type: "string" },
+                  },
+                  required: ["message"],
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+    "/loan/request/list": {
+      get: {
+        summary: "Get customer loan requests or branch loan requests",
+        operationId: "listLoanRequests",
+        security: [
+          {
+            jwt: ["customer", "manager"],
+          },
+        ],
+        responses: {
+          200: {
+            description: "Successful retrieval of loan requests",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "array",
+                  items: {
+                    $ref: "#/components/schemas/LoanRequest",
+                  },
+                },
+              },
+            },
+          },
+          500: {
+            description: "Failed to retrieve loan requests",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    message: {
+                      type: "string",
+                    },
+                  },
+                  required: ["message"],
+                },
+              },
+            },
+          },
+        },
+      },
+    },
   },
   components: {
     responses: {
@@ -127,6 +449,70 @@ const apiDoc: OpenAPIV3.Document = {
       },
     },
     schemas: {
+      Loan: {
+        type: "object",
+        properties: {
+          loanId: { type: "integer" },
+          loanType: { type: "string" },
+          amount: { type: "number", format: "float" },
+          interestRate: { type: "number", format: "float" },
+          purpose: { type: "string" },
+          requestId: { type: "integer" },
+          startDate: { type: "string" },
+          endDate: { type: "string" },
+        },
+        required: [
+          "loanId",
+          "loanType",
+          "amount",
+          "interestRate",
+          "purpose",
+          "startDate",
+          "endDate",
+        ],
+      },
+      LoanRequest: {
+        type: "object",
+        properties: {
+          id: {
+            type: "number",
+          },
+          employeeId: {
+            type: "number",
+          },
+          customerId: {
+            type: "number",
+          },
+          type: {
+            type: "string",
+            enum: ["Business", "Personal"],
+          },
+          amount: {
+            type: "number",
+            format: "float",
+          },
+          purpose: {
+            type: "string",
+          },
+          status: {
+            type: "string",
+            enum: ["Pending", "Approved", "Rejected"],
+          },
+          timePeriod: {
+            type: "number",
+          },
+        },
+        required: [
+          "requestId",
+          "employeeId",
+          "customerId",
+          "loanType",
+          "loanAmount",
+          "purpose",
+          "status",
+          "timePeriod",
+        ],
+      },
       ValidationError: {
         type: "object",
         properties: {
@@ -141,7 +527,6 @@ const apiDoc: OpenAPIV3.Document = {
           },
         },
         additionalProperties: true,
-        required: ["keyword", "params"],
       },
     },
     securitySchemes: {

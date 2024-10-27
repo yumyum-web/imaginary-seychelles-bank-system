@@ -14,9 +14,11 @@ import notImplemented from "./api/v1/handlers/notImplemented.js";
 import unauthorizedHandler from "./api/v1/handlers/unauthorizedHandler.js";
 import jwtHandler from "./api/v1/securityHandlers/jwtHandler.js";
 import login from "./api/v1/handlers/auth/login.js";
-import profileRoutes from './routes/profileRoutes.js'; // Import the profile routes
-import organizationRoutes from './routes/organizationRoutes.js'; // Import organization routes
-import employeeRoutes from './routes/employeeRoutes.js'; // Import employee routes
+import createLoanRequest from "./api/v1/handlers/loan/request/create.js";
+import listLoans from "./api/v1/handlers/loan/list.js";
+import selfApply from "./api/v1/handlers/loan/selfapply.js";
+import listLoanRequests from "./api/v1/handlers/loan/request/list.js";
+import processLoanRequest from "./api/v1/handlers/loan/request/process.js";
 
 const app = express();
 
@@ -27,20 +29,16 @@ app.use(morgan("dev"));
 app.use(compression());
 app.use(express.json());
 
-// Use the profile routes
-app.use("/api/v1", profileRoutes); // Adjust the prefix as necessary
-
-// Use the organization routes
-app.use("/api/v1", organizationRoutes); // Adjust the prefix as necessary
-
-// Use the employee routes
-app.use("/api/v1", employeeRoutes); // Adjust the prefix as necessary
-
 const api = new OpenAPIBackend({
   definition: v1ApiDoc,
   strict: true,
   handlers: {
     login,
+    createLoanRequest,
+    listLoans,
+    listLoanRequests,
+    processLoanRequest,
+    selfApply,
     validationFail,
     notFound,
     methodNotAllowed,
@@ -50,15 +48,15 @@ const api = new OpenAPIBackend({
 });
 api.registerSecurityHandler("jwt", jwtHandler);
 await api.init();
-
-// Use the profile routes
-app.use("/api/v1", profileRoutes); // Adjust the prefix as necessary
+// @ts-expect-error - Request types are trivially incompatible
+app.use("/api/v1", (req, res) => api.handleRequest(req, req, res));
 
 app.use(
   (
     err: ExpressError,
     _req: express.Request,
     res: express.Response,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _next: express.NextFunction,
   ) => {
     res.status(err.status || 500);
