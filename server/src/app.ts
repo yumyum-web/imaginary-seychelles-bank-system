@@ -14,6 +14,7 @@ import notImplemented from "./api/v1/handlers/notImplemented.js";
 import unauthorizedHandler from "./api/v1/handlers/unauthorizedHandler.js";
 import jwtHandler from "./api/v1/securityHandlers/jwtHandler.js";
 import login from "./api/v1/handlers/auth/login.js";
+import profileRoutes from './routes/profileRoutes.js'; // Import the profile routes
 
 const app = express();
 
@@ -38,15 +39,15 @@ const api = new OpenAPIBackend({
 });
 api.registerSecurityHandler("jwt", jwtHandler);
 await api.init();
-// @ts-expect-error - Request types are trivially incompatible
-app.use("/api/v1", (req, res) => api.handleRequest(req, req, res));
+
+// Use the profile routes
+app.use("/api/v1", profileRoutes); // Adjust the prefix as necessary
 
 app.use(
   (
     err: ExpressError,
     _req: express.Request,
     res: express.Response,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _next: express.NextFunction,
   ) => {
     res.status(err.status || 500);
