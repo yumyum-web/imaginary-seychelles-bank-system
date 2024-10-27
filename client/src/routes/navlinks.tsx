@@ -9,6 +9,8 @@ import {
   IconChecks,
   IconBox,
   IconHeartHandshake,
+  IconCreditCardPay,
+  IconBuildingBank,
 } from "@tabler/icons-react";
 
 export interface NavLink {
@@ -97,5 +99,46 @@ export const employeeLinks = [
     label: "",
     href: "/employee/request-loans",
     icon: <IconHeartHandshake size={18} />,
+  },
+];
+
+export const userLinks = [
+  {
+    title: "Dashboard",
+    label: "",
+    href: "/user",
+    icon: <IconLayoutDashboard size={18} />,
+  },
+  {
+    title: "Online transfer",
+    label: "",
+    href: "/user/transfer",
+    icon: <IconCreditCardPay size={18} />,
+    // sub: [
+    //   {
+    //     title: "Savings Account",
+    //     label: "",
+    //     href: "/employee/create-savings-account",
+    //     icon: <IconPigMoney size={18} />,
+    //   },
+    //   {
+    //     title: "Checkings Account",
+    //     label: "",
+    //     href: "/employee/create-checkings-account",
+    //     icon: <IconChecks size={18} />,
+    //   },
+    //   {
+    //     title: "Fixed Deposit",
+    //     label: "",
+    //     href: "/employee/create-fixed-deposit",
+    //     icon: <IconBox size={18} />,
+    //   },
+    // ],
+  },
+  {
+    title: "Online loans",
+    label: "",
+    href: "/user/online-loan",
+    icon: <IconBuildingBank size={18} />,
   },
 ];

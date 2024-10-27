@@ -16,6 +16,7 @@ import ProtectedRoute from "./protectedRoute";
 import ComingSoon from "@/components/comingSoon";
 import { CreateLoanRequest } from "@/pages/employee/createLoanRequest";
 import { CreateFixedDeposit } from "@/pages/employee/createFixedDesposit";
+import { OnlineTransfer } from "@/pages/user/onlineTransfer";
 
 const routes: RouteObject[] = [
   { path: "/sign-in", element: <SignIn /> },
@@ -59,6 +60,21 @@ const routes: RouteObject[] = [
           {
             path: "request-loans",
             element: <CreateLoanRequest />,
+          },
+        ],
+      },
+      {
+        path: "user",
+        element: (
+          <ProtectedRoute requiredLevels={["user"]}>
+            <Employee />
+          </ProtectedRoute>
+        ),
+        children: [
+          { index: true, element: <ComingSoon /> },
+          {
+            path: "transfer",
+            element: <OnlineTransfer />,
           },
         ],
       },

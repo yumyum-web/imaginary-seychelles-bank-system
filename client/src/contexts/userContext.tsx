@@ -38,6 +38,11 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
       !location.pathname.startsWith("/employee")
     ) {
       navigate("/employee");
+    } else if (
+      userLevels.includes("user") &&
+      !location.pathname.startsWith("/user")
+    ) {
+      navigate("/user");
     }
   }, [userLevels, navigate, location.pathname]);
 

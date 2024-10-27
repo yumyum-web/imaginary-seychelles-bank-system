@@ -4,7 +4,12 @@ import { Layout } from "@/layouts/layout";
 import { Button } from "@/components/custom/button";
 import Nav from "./nav";
 import { cn } from "@/lib/utils";
-import { managerLinks, employeeLinks, NavLink } from "@/routes/navlinks";
+import {
+  managerLinks,
+  employeeLinks,
+  NavLink,
+  userLinks,
+} from "@/routes/navlinks";
 import { useUser } from "@/contexts/useUser";
 
 interface SidebarProps extends React.HTMLAttributes<HTMLElement> {
@@ -34,10 +39,10 @@ export default function Sidebar({
 
   if (userLevels?.includes("manager")) {
     links = [...links, ...managerLinks];
-  }
-
-  if (userLevels?.includes("employee")) {
+  } else if (userLevels?.includes("employee")) {
     links = [...links, ...employeeLinks];
+  } else if (userLevels?.includes("user")) {
+    links = [...links, ...userLinks];
   }
 
   // Handle the case when userLevels is null or empty
