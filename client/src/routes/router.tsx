@@ -17,6 +17,7 @@ import ComingSoon from "@/components/comingSoon";
 import { CreateLoanRequest } from "@/pages/employee/createLoanRequest";
 import { CreateFixedDeposit } from "@/pages/employee/createFixedDesposit";
 import { OnlineTransfer } from "@/pages/user/onlineTransfer";
+import { OnlineLoan } from "@/pages/user/onlineLoan";
 
 const routes: RouteObject[] = [
   { path: "/sign-in", element: <SignIn /> },
@@ -75,6 +76,10 @@ const routes: RouteObject[] = [
           {
             path: "transfer",
             element: <OnlineTransfer />,
+          },
+          {
+            path: "online-loan",
+            element: <OnlineLoan />,
           },
         ],
       },
