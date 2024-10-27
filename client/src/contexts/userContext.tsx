@@ -1,39 +1,28 @@
-import React, {
-  createContext,
-  useState,
-  useEffect,
-  useContext,
-  ReactNode,
-} from "react";
+import React, { createContext, useState, useEffect, ReactNode } from "react";
 import { User } from "./types";
 
 interface UserContextType {
   user: User | null;
+  userLevels: string[] | null;
+  setUserLevels: (userLevel: string[]) => void;
   login: (userData: User) => void;
   logout: () => void;
 }
 
 // Create the context with an initial value
-const UserContext = createContext<UserContextType | undefined>(undefined);
+export const UserContext = createContext<UserContextType | undefined>(
+  undefined,
+);
 
-// Custom hook to use the UserContext
-export const useUser = () => {
-  const context = useContext(UserContext);
-  if (!context) {
-    throw new Error("useUser must be used within a UserProvider");
-  }
-  return context;
-};
-
-// Provider component
 interface UserProviderProps {
   children: ReactNode;
 }
 
 export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null); // State to hold user data
+  const [user, setUser] = useState<User | null>(null);
+  const [userLevels, setUserLevels] = useState<string[] | null>(null);
 
-  //temp use effect to set user
+  // Temporary useEffect to set a test user
   useEffect(() => {
     setUser({ username: "test", type: "Employee", branch: "test" });
   }, []);
@@ -47,7 +36,9 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
   };
 
   return (
-    <UserContext.Provider value={{ user, login, logout }}>
+    <UserContext.Provider
+      value={{ user, userLevels, setUserLevels, login, logout }}
+    >
       {children}
     </UserContext.Provider>
   );
