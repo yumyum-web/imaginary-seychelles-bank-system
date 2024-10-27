@@ -160,12 +160,10 @@ const apiDoc: OpenAPIV3.Document = {
         },
       },
     },
-
-    "/loans/create": {
-      // New Endpoint
+    "/loan/request/create": {
       post: {
         summary: "Create a loan request",
-        operationId: "create",
+        operationId: "createLoanRequest",
         requestBody: {
           required: true,
           content: {
@@ -173,9 +171,6 @@ const apiDoc: OpenAPIV3.Document = {
               schema: {
                 type: "object",
                 properties: {
-                  employeeId: {
-                    type: "integer",
-                  },
                   loanType: {
                     type: "string",
                     enum: ["Business", "Personal"],
@@ -195,7 +190,6 @@ const apiDoc: OpenAPIV3.Document = {
                   },
                 },
                 required: [
-                  "employeeId",
                   "loanType",
                   "loanAmount",
                   "purpose",
@@ -206,6 +200,11 @@ const apiDoc: OpenAPIV3.Document = {
             },
           },
         },
+        security: [
+          {
+            jwt: ["employee"],
+          },
+        ],
         responses: {
           201: {
             description: "Loan request created successfully",
@@ -217,31 +216,8 @@ const apiDoc: OpenAPIV3.Document = {
                     message: {
                       type: "string",
                     },
-                    loanType: {
-                      type: "string",
-                    },
-                    amount: {
-                      type: "number",
-                      format: "float",
-                    },
-                    purpose: {
-                      type: "string",
-                    },
-                    status: {
-                      type: "string",
-                    },
-                    timePeriod: {
-                      type: "integer",
-                    },
                   },
-                  required: [
-                    "message",
-                    "loanType",
-                    "amount",
-                    "purpose",
-                    "status",
-                    "timePeriod",
-                  ],
+                  required: ["message"],
                 },
               },
             },

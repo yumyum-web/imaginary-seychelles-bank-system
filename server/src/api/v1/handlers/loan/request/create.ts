@@ -1,8 +1,8 @@
 import { Handler } from "openapi-backend";
-import conn from "../../helpers/db.js";
+import conn from "../../../helpers/db.js";
+import { User } from "../../../models/User.js";
 
 interface LoanRequestBody {
-  employeeId: number;
   loanType: "Business" | "Personal";
   loanAmount: number;
   purpose: string;
@@ -10,29 +10,22 @@ interface LoanRequestBody {
   timePeriod: number;
 }
 
-const create: Handler<LoanRequestBody> = async (c, _, res) => {
-  const { employeeId, loanType, loanAmount, purpose, accountId, timePeriod } =
+const createLoanRequest: Handler<LoanRequestBody> = async (c, _, res) => {
+  const { loanType, loanAmount, purpose, accountId, timePeriod } =
     c.request.requestBody;
+  const user: User = c.security.jwt;
 
   try {
     // Call stored procedure to create a loan request
-    await conn.execute("CALL Create_Loan_Request(?, ?, ?, ?, ?, ?)", [
-      employeeId,
-      loanType,
-      loanAmount,
-      purpose,
-      accountId,
-      timePeriod,
-    ]);
+    const [Result] = await conn.execute(
+      "CALL Create_Loan_Request(?, ?, ?, ?, ?, ?)",
+      [user.employee?.id, loanType, loanAmount, purpose, accountId, timePeriod],
+    );
 
+    console.log("Loan request:", Result);
     // Response if procedure completes successfully
     return res.status(201).json({
       message: "Loan request created successfully.",
-      loanType,
-      amount: loanAmount,
-      purpose,
-      status: "Pending",
-      timePeriod,
     });
   } catch (error) {
     console.error("Failed to create loan request:", error);
@@ -40,4 +33,4 @@ const create: Handler<LoanRequestBody> = async (c, _, res) => {
   }
 };
 
-export default create;
+export default createLoanRequest;
