@@ -663,6 +663,64 @@ const apiDoc: OpenAPIV3.Document = {
         },
       },
     },
+    "/fixedDeposit/list": {
+      get: {
+        summary: "List fixed deposits",
+        operationId: "listFixedDeposits",
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                properties: {
+                  customerId: {
+                    type: "number",
+                  },
+                },
+              },
+            },
+          },
+        },
+        security: [
+          {
+            jwt: ["customer", "employee"],
+          },
+        ],
+        responses: {
+          200: {
+            description: "Fixed deposits retrieved successfully",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "array",
+                  items: {
+                    $ref: "#/components/schemas/FixedDeposit",
+                  },
+                },
+              },
+            },
+          },
+          400: {
+            $ref: "#/components/responses/ValidationFail",
+          },
+          500: {
+            description: "Failed to retrieve fixed deposits",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    message: { type: "string" },
+                  },
+                  required: ["message"],
+                },
+              },
+            },
+          },
+        },
+      },
+    },
     "/loan/selfApply": {
       post: {
         summary: "Self-apply for a loan",
@@ -1233,6 +1291,29 @@ const apiDoc: OpenAPIV3.Document = {
           "phoneNumber",
           "dateOfBirth",
           "position",
+          "branchId",
+          "branchName",
+        ],
+      },
+      FixedDeposit: {
+        type: "object",
+        properties: {
+          id: { type: "number" },
+          balance: { type: "number", format: "float" },
+          planId: { type: "number" },
+          interestRate: { type: "number", format: "float" },
+          duration: { type: "number" },
+          openedDate: { type: "string" },
+          branchId: { type: "number" },
+          branchName: { type: "string" },
+        },
+        required: [
+          "id",
+          "balance",
+          "planId",
+          "interestRate",
+          "duration",
+          "openedDate",
           "branchId",
           "branchName",
         ],
