@@ -584,6 +584,85 @@ const apiDoc: OpenAPIV3.Document = {
         },
       },
     },
+    "/fixedDeposit/create": {
+      post: {
+        summary: "Create a fixed deposit",
+        operationId: "createFixedDeposit",
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                properties: {
+                  customerId: {
+                    type: "number",
+                  },
+                  initialDeposit: {
+                    type: "number",
+                    format: "float",
+                  },
+                  savingsAccountId: {
+                    type: "number",
+                  },
+                  fixedDepositPlanId: {
+                    type: "number",
+                  },
+                },
+                required: [
+                  "customerId",
+                  "initialDeposit",
+                  "savingsAccountId",
+                  "fixedDepositPlanId",
+                ],
+              },
+            },
+          },
+        },
+        security: [
+          {
+            jwt: ["employee"],
+          },
+        ],
+        responses: {
+          201: {
+            description: "Fixed deposit created successfully",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    message: {
+                      type: "string",
+                    },
+                  },
+                  required: ["message"],
+                },
+              },
+            },
+          },
+          400: {
+            $ref: "#/components/responses/ValidationFail",
+          },
+          500: {
+            description: "Failed to create fixed deposit",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    message: {
+                      type: "string",
+                    },
+                  },
+                  required: ["message"],
+                },
+              },
+            },
+          },
+        },
+      },
+    },
     "/loan/selfApply": {
       post: {
         summary: "Self-apply for a loan",
