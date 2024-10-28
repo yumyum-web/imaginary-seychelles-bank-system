@@ -721,6 +721,46 @@ const apiDoc: OpenAPIV3.Document = {
         },
       },
     },
+    "/fixedDeposit/plans": {
+      get: {
+        summary: "List available fixed deposit plans",
+        operationId: "fixedDepositPlans",
+        security: [
+          {
+            jwt: ["logged-in"],
+          },
+        ],
+        responses: {
+          200: {
+            description: "Successful operation",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "array",
+                  items: {
+                    $ref: "#/components/schemas/FixedDepositPlan",
+                  },
+                },
+              },
+            },
+          },
+          500: {
+            description: "Failed to list fixed deposit plans",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    message: { type: "string" },
+                  },
+                  required: ["message"],
+                },
+              },
+            },
+          },
+        },
+      },
+    },
     "/loan/selfApply": {
       post: {
         summary: "Self-apply for a loan",
@@ -1317,6 +1357,15 @@ const apiDoc: OpenAPIV3.Document = {
           "branchId",
           "branchName",
         ],
+      },
+      FixedDepositPlan: {
+        type: "object",
+        properties: {
+          id: { type: "number" },
+          interestRate: { type: "number", format: "float" },
+          duration: { type: "number" },
+        },
+        required: ["id", "interestRate", "duration"],
       },
       Loan: {
         type: "object",
