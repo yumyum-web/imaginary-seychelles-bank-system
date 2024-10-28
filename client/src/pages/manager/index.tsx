@@ -1,17 +1,14 @@
+import { Outlet } from "react-router-dom";
 import { Layout } from "@/layouts/layout";
 import { Search } from "@/components/custom/search";
 import ThemeSwitch from "@/components/custom/themeSwitch";
 import { UserNav } from "@/components/navigation/userNav";
-// import { DataTable } from './components/data-table'
-// import { columns } from './components/columns'
-// import { tasks } from './data/tasks'
-import { Outlet } from "react-router-dom";
 
-export default function Manager() {
+export default function Employee() {
   return (
-    <Layout>
+    <Layout fixed>
       {/* ===== Top Heading ===== */}
-      <Layout.Header sticky>
+      <Layout.Header>
         <Search />
         <div className="ml-auto flex items-center space-x-4">
           <ThemeSwitch />
@@ -19,7 +16,7 @@ export default function Manager() {
         </div>
       </Layout.Header>
 
-      <Layout.Body>
+      <Layout.Body className="flex flex-col">
         <Outlet />
       </Layout.Body>
     </Layout>

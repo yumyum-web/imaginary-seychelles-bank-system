@@ -35,7 +35,7 @@ const routes: RouteObject[] = [
           </ProtectedRoute>
         ),
         children: [
-          { index: true, element: <LateLoanInstallments /> },
+          { index: true, element: <ComingSoon /> },
           { path: "late-loan-installments", element: <LateLoanInstallments /> },
           { path: "total-transactions", element: <TotalTransactions /> },
           { path: "loan-requests", element: <LoanRequests /> },

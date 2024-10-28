@@ -36,7 +36,7 @@ export function UserAuthForm({
   className,
   ...props
 }: HTMLAttributes<HTMLDivElement>) {
-  const { setUserLevels, setToken } = useUser();
+  const { setUserLevels, setToken, setUserType } = useUser();
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast(); // Destructure toast from useToast hook
 
@@ -65,8 +65,15 @@ export function UserAuthForm({
         JSON.stringify(response.user.levels),
       );
 
+      const userType = response.user.customer
+        ? response.user.customer.type
+        : "employee";
+      sessionStorage.setItem("userType", userType);
+
       setToken(response.token);
       setUserLevels(response.user.levels);
+      setUserType(userType);
+
       toast({
         title: "Login Successful",
         description: "Welcome back!",
