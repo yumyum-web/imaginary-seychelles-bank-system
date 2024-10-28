@@ -1,13 +1,14 @@
 import React, { createContext, useState, useEffect, ReactNode } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { User } from "./types";
+import { Individual, Organization, Employee } from "./types";
 
 interface UserContextType {
-  user: User | null;
+  user: Individual | Organization | Employee | null;
+  setUser: (user: Individual | Organization | Employee) => void;
+  token: string | null;
+  setToken: (token: string) => void;
   userLevels: string[] | null;
   setUserLevels: (userLevel: string[]) => void;
-  login: (userData: User) => void;
-  logout: () => void;
 }
 
 export const UserContext = createContext<UserContextType | undefined>(
@@ -19,10 +20,23 @@ interface UserProviderProps {
 }
 
 export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<Individual | Organization | Employee | null>(
+    null,
+  );
+  const [token, setToken] = useState<string | null>(null);
   const [userLevels, setUserLevels] = useState<string[] | null>(null);
   const navigate = useNavigate();
   const location = useLocation();
+
+  //initially get the token and user levels from the session storage
+  useEffect(() => {
+    const storedToken = sessionStorage.getItem("token");
+    const storedUserLevels = sessionStorage.getItem("userLevels");
+    if (storedToken && storedUserLevels) {
+      setToken(storedToken);
+      setUserLevels(JSON.parse(storedUserLevels));
+    }
+  }, []);
 
   useEffect(() => {
     // Redirect based on user level if the user is on a different path
@@ -46,19 +60,9 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
     }
   }, [userLevels, navigate, location.pathname]);
 
-  const login = (userData: User) => {
-    setUser(userData);
-  };
-
-  const logout = () => {
-    setUser(null);
-    setUserLevels(null);
-    navigate("/sign-in");
-  };
-
   return (
     <UserContext.Provider
-      value={{ user, userLevels, setUserLevels, login, logout }}
+      value={{ user, setUser, token, setToken, userLevels, setUserLevels }}
     >
       {children}
     </UserContext.Provider>
