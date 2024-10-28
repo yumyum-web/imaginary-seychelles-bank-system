@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+
+//import processLoanRequestAPI from "@/api/approve";
+import listLoanRequestsAPI from "@/api/requestlist";
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -76,6 +78,7 @@ const data: loanRequests[] = [
   },
 ];
 */
+
 export const columns: ColumnDef<loanRequests>[] = [
   {
     id: "select",
@@ -210,16 +213,8 @@ export function LoanRequests() {
   useEffect(() => {
     const fetchLoanRequests = async () => {
       try {
-        const token = sessionStorage.getItem("token");
-        const response = await axios.get(
-          "http://localhost:5000/api/v1/loan/request/list",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          },
-        );
-        setLoanData(response.data);
+        const requests = await listLoanRequestsAPI(); // Use the API function to fetch loan requests
+        setLoanData(requests);
         toast({
           title: "Data Loaded",
           description: "Loan requests have been successfully loaded.",
@@ -236,7 +231,7 @@ export function LoanRequests() {
     };
 
     fetchLoanRequests();
-  }, []);
+  }, [toast]); // Added toast as a dependency
 
   const table = useReactTable({
     data: loanData,
