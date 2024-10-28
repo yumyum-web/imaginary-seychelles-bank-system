@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import axios from "axios";
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -24,7 +25,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Input } from "@/components/ui/input";
+//import { Input } from "@/components/ui/input";
 import {
   Table,
   TableBody,
@@ -34,7 +35,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { loanRequests } from "./types";
-
+import { useToast } from "@/hooks/use-toast";
+/*
 //sample data
 const data: loanRequests[] = [
   {
@@ -73,7 +75,7 @@ const data: loanRequests[] = [
     amount: 750000,
   },
 ];
-
+*/
 export const columns: ColumnDef<loanRequests>[] = [
   {
     id: "select",
@@ -98,7 +100,7 @@ export const columns: ColumnDef<loanRequests>[] = [
     enableHiding: false,
   },
   {
-    accessorKey: "requestId",
+    accessorKey: "id",
     header: ({ column }) => {
       return (
         <Button
@@ -110,22 +112,22 @@ export const columns: ColumnDef<loanRequests>[] = [
         </Button>
       );
     },
-    cell: ({ row }) => <div>{row.getValue("requestId")}</div>,
+    cell: ({ row }) => <div>{row.getValue("id")}</div>,
   },
   {
-    accessorKey: "accId",
+    accessorKey: "customerId",
     header: ({ column }) => {
       return (
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Account ID
+          Customer ID
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
     },
-    cell: ({ row }) => <div>{row.getValue("accId")}</div>,
+    cell: ({ row }) => <div>{row.getValue("customerId")}</div>,
   },
   {
     accessorKey: "type",
@@ -198,13 +200,43 @@ export const columns: ColumnDef<loanRequests>[] = [
 ];
 
 export function LoanRequests() {
+  const { toast } = useToast();
+  const [loanData, setLoanData] = useState<loanRequests[]>([]);
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
 
+  useEffect(() => {
+    const fetchLoanRequests = async () => {
+      try {
+        const token = sessionStorage.getItem("token");
+        const response = await axios.get("/loan/request/list", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        setLoanData(response.data);
+        toast({
+          title: "Data Loaded",
+          description: "Loan requests have been successfully loaded.",
+          variant: "default",
+        });
+      } catch (error) {
+        toast({
+          title: "Error",
+          description: "Unable to load loan requests.",
+          variant: "destructive",
+        });
+        console.error("Error fetching loan requests:", error);
+      }
+    };
+
+    fetchLoanRequests();
+  }, []);
+
   const table = useReactTable({
-    data,
+    data: loanData,
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
