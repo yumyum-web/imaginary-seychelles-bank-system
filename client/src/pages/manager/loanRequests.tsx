@@ -211,11 +211,14 @@ export function LoanRequests() {
     const fetchLoanRequests = async () => {
       try {
         const token = sessionStorage.getItem("token");
-        const response = await axios.get("/loan/request/list", {
-          headers: {
-            Authorization: `Bearer ${token}`,
+        const response = await axios.get(
+          "http://localhost:5000/api/v1/loan/request/list",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
           },
-        });
+        );
         setLoanData(response.data);
         toast({
           title: "Data Loaded",
