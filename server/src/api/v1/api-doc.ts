@@ -185,6 +185,74 @@ const apiDoc: OpenAPIV3.Document = {
         },
       },
     },
+    "/account/withdraw": {
+      post: {
+        summary: "Withdraw money from an account",
+        operationId: "accountWithdraw",
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                properties: {
+                  accountId: {
+                    type: "number",
+                  },
+                  amount: {
+                    type: "number",
+                    format: "float",
+                  },
+                },
+                required: ["accountId", "amount"],
+              },
+            },
+          },
+        },
+        security: [
+          {
+            jwt: ["employee"],
+          },
+        ],
+        responses: {
+          200: {
+            description: "Withdrawal successful",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    message: {
+                      type: "string",
+                    },
+                  },
+                  required: ["message"],
+                },
+              },
+            },
+          },
+          400: {
+            $ref: "#/components/responses/ValidationFail",
+          },
+          500: {
+            description: "Failed to withdraw money",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    message: {
+                      type: "string",
+                    },
+                  },
+                  required: ["message"],
+                },
+              },
+            },
+          },
+        },
+      },
+    },
     "/account/checking/list": {
       get: {
         summary: "List checking accounts",

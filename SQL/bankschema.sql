@@ -82,7 +82,9 @@ CREATE TABLE Activity (
     'Online Transfer',
     'Loan Deposit',
     'Loan Installment',
-    'Interest'
+    'Interest',
+    'Bank Withdrawal',
+    'Bank Deposit'
   ) NOT NULL,
   Amount DECIMAL(10, 2) CHECK (Amount > 0.00),
   DATE DATETIME NOT NULL
