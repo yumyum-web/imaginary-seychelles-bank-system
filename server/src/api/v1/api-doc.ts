@@ -321,6 +321,77 @@ const apiDoc: OpenAPIV3.Document = {
         },
       },
     },
+    "/account/transfer": {
+      post: {
+        summary: "Transfer money between accounts",
+        operationId: "accountTransfer",
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                properties: {
+                  fromAccountId: {
+                    type: "number",
+                  },
+                  toAccountId: {
+                    type: "number",
+                  },
+                  amount: {
+                    type: "number",
+                    format: "float",
+                  },
+                },
+                required: ["fromAccountId", "toAccountId", "amount"],
+              },
+            },
+          },
+        },
+        security: [
+          {
+            jwt: ["customer"],
+          },
+        ],
+        responses: {
+          200: {
+            description: "Transfer successful",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    message: {
+                      type: "string",
+                    },
+                  },
+                  required: ["message"],
+                },
+              },
+            },
+          },
+          400: {
+            $ref: "#/components/responses/ValidationFail",
+          },
+          500: {
+            description: "Failed to transfer money",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    message: {
+                      type: "string",
+                    },
+                  },
+                  required: ["message"],
+                },
+              },
+            },
+          },
+        },
+      },
+    },
     "/account/checking/list": {
       get: {
         summary: "List checking accounts",
