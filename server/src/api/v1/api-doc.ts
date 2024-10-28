@@ -392,6 +392,77 @@ const apiDoc: OpenAPIV3.Document = {
         },
       },
     },
+    "/account/transactionHistory": {
+      get: {
+        summary:
+          "Get transaction history of an account. Customers can only view for their own accounts. Employees can view for any account.",
+        operationId: "accountTransactionHistory",
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                properties: {
+                  accountId: {
+                    type: "number",
+                  },
+                },
+                required: ["accountId"],
+              },
+            },
+          },
+        },
+        security: [
+          {
+            jwt: ["customer", "employee"],
+          },
+        ],
+        responses: {
+          200: {
+            description: "Transaction history retrieved successfully",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "array",
+                  items: {
+                    type: "object",
+                    properties: {
+                      id: { type: "number" },
+                      type: { type: "string" },
+                      activityType: { type: "string" },
+                      amount: { type: "number", format: "float" },
+                      date: { type: "string" },
+                    },
+                    required: ["id", "type", "activityType", "amount", "date"],
+                  },
+                },
+              },
+            },
+          },
+          400: {
+            $ref: "#/components/responses/ValidationFail",
+          },
+          403: {
+            $ref: "#/components/responses/Forbidden",
+          },
+          500: {
+            description: "Failed to retrieve transaction history",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    message: { type: "string" },
+                  },
+                  required: ["message"],
+                },
+              },
+            },
+          },
+        },
+      },
+    },
     "/account/checking/list": {
       get: {
         summary: "List checking accounts",
