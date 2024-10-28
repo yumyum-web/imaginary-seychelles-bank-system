@@ -38,8 +38,10 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
     }
   }, []);
 
+  // Second useEffect to handle navigation based on user level
   useEffect(() => {
-    // Redirect based on user level if the user is on a different path
+    if (userLevels === null) return; // Ensure it only runs after userLevels are loaded
+
     if (!userLevels) {
       navigate("/sign-in");
     } else if (
