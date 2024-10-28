@@ -253,6 +253,74 @@ const apiDoc: OpenAPIV3.Document = {
         },
       },
     },
+    "/account/deposit": {
+      post: {
+        summary: "Deposit money from an account",
+        operationId: "accountDeposit",
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                properties: {
+                  accountId: {
+                    type: "number",
+                  },
+                  amount: {
+                    type: "number",
+                    format: "float",
+                  },
+                },
+                required: ["accountId", "amount"],
+              },
+            },
+          },
+        },
+        security: [
+          {
+            jwt: ["employee"],
+          },
+        ],
+        responses: {
+          200: {
+            description: "Deposit successful",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    message: {
+                      type: "string",
+                    },
+                  },
+                  required: ["message"],
+                },
+              },
+            },
+          },
+          400: {
+            $ref: "#/components/responses/ValidationFail",
+          },
+          500: {
+            description: "Failed to deposit money",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    message: {
+                      type: "string",
+                    },
+                  },
+                  required: ["message"],
+                },
+              },
+            },
+          },
+        },
+      },
+    },
     "/account/checking/list": {
       get: {
         summary: "List checking accounts",
