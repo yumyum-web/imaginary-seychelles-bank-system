@@ -34,3 +34,23 @@ export type FixedDepositPlan = {
   interestRate: number;
   duration: number;
 };
+
+export interface BranchWiseTransaction {
+  id: number;
+  type: string;
+  activityType: string;
+  accountId: number;
+  amount: number;
+  date: string;
+}
+
+export interface BranchWiseLateLoanInstallment {
+  id: number;
+  loanAmount: number;
+  customerId: number;
+  loanType: string;
+  loanStartDate: string;
+  loanEndDate: string;
+  amount: number;
+  dueDate: string;
+}

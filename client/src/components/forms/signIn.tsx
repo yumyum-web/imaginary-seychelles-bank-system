@@ -24,7 +24,7 @@ const formSchema = z.object({
   username: z
     .string()
     .min(1, { message: "Please enter your username" })
-    .min(4, { message: "Username must contain at least 5 characters" }),
+    .min(3, { message: "Username must contain at least 3 characters" }),
 
   password: z
     .string()
