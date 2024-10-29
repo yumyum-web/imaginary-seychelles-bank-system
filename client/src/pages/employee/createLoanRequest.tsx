@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/custom/button";
 import { Separator } from "@/components/ui/separator";
 import {
   Form,
@@ -20,10 +20,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useState } from "react";
+import { toast } from "@/hooks/use-toast";
+import { createLoanRequest } from "@/api/loans";
 
 // Define form schema
 const formSchema = z.object({
-  customer_id: z.string().min(1, { message: "Customer ID is required." }),
   account_id: z.string().min(1, { message: "Account ID is required." }),
   loan_type: z.enum(["Business", "Personal"], {
     required_error: "Loan type is required.",
@@ -31,7 +33,15 @@ const formSchema = z.object({
   purpose: z
     .string()
     .min(10, { message: "Purpose must be at least 10 characters." }),
-  initial_deposit: z.preprocess(
+  time_period: z.preprocess(
+    (value) => parseInt(value as string),
+    z
+      .number({
+        invalid_type_error: "Time period must be a number.",
+      })
+      .min(1, { message: "Time period must be greater than 0." }),
+  ),
+  amount: z.preprocess(
     (value) => parseFloat(value as string),
     z
       .number({
@@ -42,22 +52,48 @@ const formSchema = z.object({
 });
 
 export function CreateLoanRequest() {
-  // State for plan description
+  const [isLoading, setIsLoading] = useState(false);
 
-  const form = useForm({
+  const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      customer_id: "",
       account_id: "",
-      loan_type: "",
+      loan_type: "Business",
       purpose: "",
-      amount: "",
+      time_period: 0,
+      amount: 0,
     },
   });
 
   // Submit handler
-  function onSubmit() {
-    console.log("Form submitted with data:");
+  async function onSubmit(data: z.infer<typeof formSchema>) {
+    setIsLoading(true);
+    try {
+      const message = await createLoanRequest(
+        data.loan_type,
+        data.amount,
+        data.purpose,
+        parseInt(data.account_id),
+        data.time_period,
+      );
+
+      toast({
+        title: "Success",
+        description: message,
+      });
+
+      form.reset();
+    } catch (error) {
+      toast({
+        title: "Error",
+        description:
+          (error as { message?: string })?.message ||
+          "Failed to create checkings account",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   return (
@@ -74,24 +110,6 @@ export function CreateLoanRequest() {
       <div className="flex flex-1 flex-col space-y-8 md:space-y-2 lg:flex-row md:overflow-auto lg:space-x-12 lg:space-y-0 md:px-6 lg:px-10 no-scrollbar">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-            {/* Customer ID Field */}
-            <FormField
-              control={form.control}
-              name="customer_id"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Enter Customer ID</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Customer" {...field} />
-                  </FormControl>
-                  <FormDescription>
-                    This is the customer ID of the customer you want to create a
-                    new loan request.
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
             <FormField
               control={form.control}
               name="account_id"
@@ -99,7 +117,7 @@ export function CreateLoanRequest() {
                 <FormItem>
                   <FormLabel>Enter Account ID</FormLabel>
                   <FormControl>
-                    <Input placeholder="Customer" {...field} />
+                    <Input placeholder="Account" {...field} />
                   </FormControl>
                   <FormDescription>
                     This is the account ID of the customer you want to create a
@@ -161,6 +179,30 @@ export function CreateLoanRequest() {
 
             <FormField
               control={form.control}
+              name="time_period"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Time Period</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="Months"
+                      {...field}
+                      value={field.value !== undefined ? field.value : ""}
+                      onChange={(e) => {
+                        field.onChange(e.target.value);
+                      }}
+                    />
+                  </FormControl>
+                  <FormDescription>
+                    The time period for the loan request in months
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
               name="amount"
               render={({ field }) => (
                 <FormItem>
@@ -181,7 +223,9 @@ export function CreateLoanRequest() {
               )}
             />
 
-            <Button type="submit">Request Loan</Button>
+            <Button type="submit" className="mt-2 text-md" loading={isLoading}>
+              {isLoading ? "Creating..." : "Create"}
+            </Button>
           </form>
         </Form>
       </div>
