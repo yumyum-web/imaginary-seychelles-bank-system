@@ -4,25 +4,25 @@ CREATE PROCEDURE Create_Savings_Account (
   IN p_BranchId INT,
   IN p_Balance DECIMAL(10, 2),
   IN p_SA_plan_id INT
-) BEGIN DECLARE Min_Balance DECIMAL(10, 2) DEFAULT 0;
+) BEGIN DECLARE v_Min_Balance DECIMAL(10, 2);
 
 -- Get the minimum balance required for the specified savings account plan
 SELECT
-  Min_Balance INTO Min_Balance
+  Min_Balance INTO v_Min_Balance
 FROM
   SA_plan
 WHERE
   SA_plan_id = p_SA_plan_id;
 
 -- If the specified savings account plan ID is invalid, raise an error
-IF Min_Balance IS NULL THEN SIGNAL SQLSTATE '45000'
+IF v_Min_Balance IS NULL THEN SIGNAL SQLSTATE '45000'
 SET
   MESSAGE_TEXT = 'Invalid savings account plan ID.';
 
 END IF;
 
 -- Check if the initial balance meets the minimum balance requirement
-IF p_Balance < Min_Balance THEN SIGNAL SQLSTATE '45000'
+IF p_Balance < v_Min_Balance THEN SIGNAL SQLSTATE '45000'
 SET
   MESSAGE_TEXT = 'Initial balance does not meet the minimum balance requirement.';
 
@@ -192,20 +192,20 @@ END;
 -- Available_Withdrawals: Returns the number of withdrawals that can be made from an account.
 CREATE FUNCTION Available_Withdrawals (Acc_id INT) RETURNS INT DETERMINISTIC BEGIN;
 
-DECLARE No_of_withdrawals INT;
+DECLARE v_No_of_withdrawals INT;
 
 SELECT
-  No_of_withdrawals INTO No_of_withdrawals
+  No_of_withdrawals INTO v_No_of_withdrawals
 FROM
   Savings_Account
 WHERE
   Savings_Account.Acc_id = Acc_id;
 
-IF No_of_withdrawals IS NULL THEN
+IF v_No_of_withdrawals IS NULL THEN
 RETURN NULL;
 
 ELSE
-RETURN 5 - No_of_withdrawals;
+RETURN 5 - v_No_of_withdrawals;
 
 END IF;
 
