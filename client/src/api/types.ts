@@ -54,3 +54,14 @@ export interface BranchWiseLateLoanInstallment {
   amount: number;
   dueDate: string;
 }
+
+export interface LoanRequest {
+  id: number;
+  employeeId: number;
+  customerId: number;
+  type: "Business" | "Personal";
+  amount: number;
+  purpose: string;
+  status: "Pending" | "Approved" | "Rejected";
+  timePeriod: number;
+}
