@@ -3,16 +3,16 @@ import conn from "../../helpers/db.js";
 import { ProcedureCallPacket, RowDataPacket } from "mysql2";
 import { User } from "../../models/User.js";
 
-interface TransactionHistoryBody {
+interface TransactionHistoryQuery {
   accountId: number;
 }
 
-const accountTransactionHistory: Handler<TransactionHistoryBody> = async (
-  c,
-  _,
-  res,
-) => {
-  const { accountId } = c.request.requestBody;
+const accountTransactionHistory: Handler<
+  never,
+  never,
+  TransactionHistoryQuery
+> = async (c, _, res) => {
+  const { accountId } = c.request.query;
   const user: User = c.security.jwt;
 
   try {

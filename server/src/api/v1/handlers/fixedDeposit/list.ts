@@ -3,12 +3,16 @@ import conn from "../../helpers/db.js";
 import { User } from "../../models/User.js";
 import { ResultSetHeader } from "mysql2";
 
-interface ListFixedDepositBody {
+interface ListFixedDepositQuery {
   customerId?: number;
 }
 
-const listFixedDeposits: Handler<ListFixedDepositBody> = async (c, _, res) => {
-  const { customerId } = c.request.requestBody;
+const listFixedDeposits: Handler<never, never, ListFixedDepositQuery> = async (
+  c,
+  _,
+  res,
+) => {
+  const { customerId } = c.request.query;
   const user: User = c.security.jwt;
 
   if (

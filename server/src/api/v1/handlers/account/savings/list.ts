@@ -3,16 +3,16 @@ import conn from "../../../helpers/db.js";
 import { User } from "../../../models/User.js";
 import { ResultSetHeader } from "mysql2";
 
-interface ListSavingsAccountsBody {
+interface ListSavingsAccountsQuery {
   customerId?: number;
 }
 
-const listSavingsAccounts: Handler<ListSavingsAccountsBody> = async (
-  c,
-  _,
-  res,
-) => {
-  const { customerId } = c.request.requestBody;
+const listSavingsAccounts: Handler<
+  never,
+  never,
+  ListSavingsAccountsQuery
+> = async (c, _, res) => {
+  const { customerId } = c.request.query;
   const user: User = c.security.jwt;
 
   if (

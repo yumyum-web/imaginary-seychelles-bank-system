@@ -397,22 +397,16 @@ const apiDoc: OpenAPIV3.Document = {
         summary:
           "Get transaction history of an account. Customers can only view for their own accounts. Employees can view for any account.",
         operationId: "accountTransactionHistory",
-        requestBody: {
-          required: true,
-          content: {
-            "application/json": {
-              schema: {
-                type: "object",
-                properties: {
-                  accountId: {
-                    type: "number",
-                  },
-                },
-                required: ["accountId"],
-              },
+        parameters: [
+          {
+            name: "accountId",
+            in: "query",
+            required: true,
+            schema: {
+              type: "number",
             },
           },
-        },
+        ],
         security: [
           {
             jwt: ["customer", "employee"],
@@ -467,6 +461,16 @@ const apiDoc: OpenAPIV3.Document = {
       get: {
         summary: "List checking accounts",
         operationId: "listCheckingAccounts",
+        parameters: [
+          {
+            name: "customerId",
+            in: "query",
+            required: false,
+            schema: {
+              type: "number",
+            },
+          },
+        ],
         security: [
           {
             jwt: ["customer", "employee"],
@@ -667,21 +671,16 @@ const apiDoc: OpenAPIV3.Document = {
       get: {
         summary: "List fixed deposits",
         operationId: "listFixedDeposits",
-        requestBody: {
-          required: true,
-          content: {
-            "application/json": {
-              schema: {
-                type: "object",
-                properties: {
-                  customerId: {
-                    type: "number",
-                  },
-                },
-              },
+        parameters: [
+          {
+            name: "customerId",
+            in: "query",
+            required: false,
+            schema: {
+              type: "number",
             },
           },
-        },
+        ],
         security: [
           {
             jwt: ["customer", "employee"],
@@ -1088,21 +1087,16 @@ const apiDoc: OpenAPIV3.Document = {
         summary:
           "List savings accounts of a customer. Employees can list any customer's accounts. Customers can only list their own accounts.",
         operationId: "listSavingsAccounts",
-        requestBody: {
-          required: true,
-          content: {
-            "application/json": {
-              schema: {
-                type: "object",
-                properties: {
-                  customerId: {
-                    type: "number",
-                  },
-                },
-              },
+        parameters: [
+          {
+            name: "customerId",
+            in: "query",
+            required: false,
+            schema: {
+              type: "number",
             },
           },
-        },
+        ],
         security: [
           {
             jwt: ["customer", "employee"],
