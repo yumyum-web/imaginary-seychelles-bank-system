@@ -7,11 +7,11 @@ interface ListFixedDepositQuery {
   customerId?: number;
 }
 
-const listFixedDeposits: Handler<never, never, ListFixedDepositQuery> = async (
-  c,
-  _,
-  res,
-) => {
+const listFixedDeposits: Handler<
+  unknown,
+  unknown,
+  ListFixedDepositQuery
+> = async (c, _, res) => {
   const { customerId } = c.request.query;
   const user: User = c.security.jwt;
 

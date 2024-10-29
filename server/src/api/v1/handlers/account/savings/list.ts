@@ -8,8 +8,8 @@ interface ListSavingsAccountsQuery {
 }
 
 const listSavingsAccounts: Handler<
-  never,
-  never,
+  unknown,
+  unknown,
   ListSavingsAccountsQuery
 > = async (c, _, res) => {
   const { customerId } = c.request.query;

@@ -8,8 +8,8 @@ interface ListCheckingAccountsQuery {
 }
 
 const listCheckingAccounts: Handler<
-  never,
-  never,
+  unknown,
+  unknown,
   ListCheckingAccountsQuery
 > = async (c, _, res) => {
   const { customerId } = c.request.query;

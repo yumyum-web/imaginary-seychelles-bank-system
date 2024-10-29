@@ -8,8 +8,8 @@ interface TransactionHistoryQuery {
 }
 
 const accountTransactionHistory: Handler<
-  never,
-  never,
+  unknown,
+  unknown,
   TransactionHistoryQuery
 > = async (c, _, res) => {
   const { accountId } = c.request.query;
