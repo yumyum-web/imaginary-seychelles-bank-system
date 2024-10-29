@@ -75,7 +75,7 @@ const apiDoc: OpenAPIV3.Document = {
             },
           },
           400: {
-            $ref: "#/components/responses/ValidationFail",
+            $ref: "#/components/responses/BadRequest",
           },
         },
       },
@@ -232,7 +232,7 @@ const apiDoc: OpenAPIV3.Document = {
             },
           },
           400: {
-            $ref: "#/components/responses/ValidationFail",
+            $ref: "#/components/responses/BadRequest",
           },
           500: {
             description: "Failed to withdraw money",
@@ -300,7 +300,7 @@ const apiDoc: OpenAPIV3.Document = {
             },
           },
           400: {
-            $ref: "#/components/responses/ValidationFail",
+            $ref: "#/components/responses/BadRequest",
           },
           500: {
             description: "Failed to deposit money",
@@ -371,7 +371,7 @@ const apiDoc: OpenAPIV3.Document = {
             },
           },
           400: {
-            $ref: "#/components/responses/ValidationFail",
+            $ref: "#/components/responses/BadRequest",
           },
           500: {
             description: "Failed to transfer money",
@@ -435,7 +435,7 @@ const apiDoc: OpenAPIV3.Document = {
             },
           },
           400: {
-            $ref: "#/components/responses/ValidationFail",
+            $ref: "#/components/responses/BadRequest",
           },
           403: {
             $ref: "#/components/responses/Forbidden",
@@ -501,7 +501,7 @@ const apiDoc: OpenAPIV3.Document = {
             $ref: "#/components/responses/Forbidden",
           },
           400: {
-            $ref: "#/components/responses/ValidationFail",
+            $ref: "#/components/responses/BadRequest",
           },
           500: {
             description: "Failed to retrieve checking accounts",
@@ -567,7 +567,7 @@ const apiDoc: OpenAPIV3.Document = {
             },
           },
           400: {
-            $ref: "#/components/responses/ValidationFail",
+            $ref: "#/components/responses/BadRequest",
           },
           500: {
             description: "Failed to create checking account",
@@ -646,7 +646,7 @@ const apiDoc: OpenAPIV3.Document = {
             },
           },
           400: {
-            $ref: "#/components/responses/ValidationFail",
+            $ref: "#/components/responses/BadRequest",
           },
           500: {
             description: "Failed to create fixed deposit",
@@ -701,7 +701,7 @@ const apiDoc: OpenAPIV3.Document = {
             },
           },
           400: {
-            $ref: "#/components/responses/ValidationFail",
+            $ref: "#/components/responses/BadRequest",
           },
           500: {
             description: "Failed to retrieve fixed deposits",
@@ -827,7 +827,7 @@ const apiDoc: OpenAPIV3.Document = {
             },
           },
           400: {
-            $ref: "#/components/responses/ValidationFail",
+            $ref: "#/components/responses/BadRequest",
           },
           500: {
             description: "Failed to apply for loan",
@@ -911,7 +911,7 @@ const apiDoc: OpenAPIV3.Document = {
             },
           },
           400: {
-            $ref: "#/components/responses/ValidationFail",
+            $ref: "#/components/responses/BadRequest",
           },
           500: {
             description: "Failed to create loan request",
@@ -979,7 +979,7 @@ const apiDoc: OpenAPIV3.Document = {
             },
           },
           400: {
-            $ref: "#/components/responses/ValidationFail",
+            $ref: "#/components/responses/BadRequest",
           },
           500: {
             description: "Failed to process loan request",
@@ -1117,7 +1117,7 @@ const apiDoc: OpenAPIV3.Document = {
             },
           },
           400: {
-            $ref: "#/components/responses/ValidationFail",
+            $ref: "#/components/responses/BadRequest",
           },
           401: {
             $ref: "#/components/responses/Unauthorized",
@@ -1175,7 +1175,7 @@ const apiDoc: OpenAPIV3.Document = {
             },
           },
           400: {
-            $ref: "#/components/responses/ValidationFail",
+            $ref: "#/components/responses/BadRequest",
           },
           500: {
             description: "Failed to create savings account",
@@ -1395,8 +1395,8 @@ const apiDoc: OpenAPIV3.Document = {
           },
         },
       },
-      ValidationFail: {
-        description: "400 Validation failed",
+      BadRequest: {
+        description: "400 Bad Request",
         content: {
           "application/json": {
             schema: {
@@ -1412,8 +1412,10 @@ const apiDoc: OpenAPIV3.Document = {
                   },
                   nullable: true,
                 },
+                message: {
+                  type: "string",
+                },
               },
-              required: ["status", "err"],
             },
           },
         },
