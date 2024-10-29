@@ -86,20 +86,20 @@ END;
 
 / / DELIMITER / /
 CREATE PROCEDURE Create_Fixed_Deposit (
-  
   IN p_BranchId INT,
   IN p_Balance DECIMAL(10, 2),
   IN p_Account_ID INT, -- The ID of the savings account
   IN p_FD_plan_id INT -- Reference to the FD plan
-) BEGIN 
-  DECLARE v_savings_account_id INT DEFAULT NULL;
-  DECLARE v_customer_id INT DEFAULT NULL;
-  
+) BEGIN DECLARE v_savings_account_id INT DEFAULT NULL;
+
+DECLARE v_customer_id INT DEFAULT NULL;
 
 -- To store the valid Savings_acc_id
 -- Check if the customer has the specified savings account
 SELECT
-  SA.Savings_acc_id,A.Customer_id INTO v_savings_account_id,v_customer_id
+  SA.Savings_acc_id,
+  A.Customer_id INTO v_savings_account_id,
+  v_customer_id
 FROM
   Account A
   JOIN Savings_Account SA ON A.Acc_id = SA.Acc_id
@@ -111,8 +111,6 @@ SET
   MESSAGE_TEXT = 'Invalid account ID.';
 
 END IF;
-  
-
 
 -- Insert into Fixed_Deposit table if validation passes
 INSERT INTO
@@ -133,8 +131,6 @@ VALUES
     NOW(),
     p_FD_plan_id
   );
-
-
 
 END;
 
@@ -303,15 +299,48 @@ CREATE PROCEDURE Create_Loan (
   IN p_request_id INT
 ) BEGIN DECLARE v_activity_id INT;
 
+DECLARE v_time_period INT;
+
+DECLARE i INT DEFAULT 0;
+
+DECLARE v_installment_amount DECIMAL(10, 2);
+
+-- Error handling
+DECLARE EXIT
+    HANDLER FOR SQLEXCEPTION BEGIN
+    ROLLBACK;
+
+    RESIGNAL;
+
+END;
+
+START TRANSACTION;
+
+-- Calculate the time period in months
+SET
+  v_time_period = PERIOD_DIFF(
+    EXTRACT(
+      YEAR_MONTH
+      FROM
+        p_end_date
+    ),
+    EXTRACT(
+      YEAR_MONTH
+      FROM
+        p_start_date
+    )
+  );
+
+-- Insert the loan activity
 INSERT INTO
   Activity (Type, Amount, DATE)
 VALUES
   ('Loan Deposit', p_loan_amount, NOW());
 
-SELECT
-  LAST_INSERT_ID() INTO v_activity_id;
+SET
+  v_activity_id = LAST_INSERT_ID();
 
--- Insert the loan into the Loan table
+-- Insert into the Loan table
 INSERT INTO
   Loan (
     Type,
@@ -339,11 +368,39 @@ VALUES
     p_end_date
   );
 
+-- Calculate and insert monthly installments
+
+SET
+  v_installment_amount = ROUND(
+    ((p_loan_amount + (p_loan_amount * p_interest_rate)) / v_time_period),
+    2
+  );
+
+WHILE i < v_time_period DO
+INSERT INTO
+  Loan_Installments (Loan_id, DATE, Amount, Activity_id)
+VALUES
+  (
+    LAST_INSERT_ID(),
+    DATE_ADD(p_start_date, INTERVAL i MONTH),
+    v_installment_amount,
+    NULL
+  );
+
+SET
+  i = i + 1;
+
+END
+WHILE;
+
+-- Update account balance
 CALL Deposit (p_account_id, p_loan_amount, v_activity_id);
 
 -- Indicate successful creation
 SELECT
   'Loan created successfully.' AS Message;
+
+COMMIT;
 
 END;
 
@@ -886,9 +943,9 @@ DECLARE interestAmount DECIMAL(10, 2);
 SELECT
   balance INTO currentBalance
 FROM
-  Accounts
+  Account
 WHERE
-  id = accountId;
+  Acc_id = accountId;
 
 -- Calculate the interest
 SET
