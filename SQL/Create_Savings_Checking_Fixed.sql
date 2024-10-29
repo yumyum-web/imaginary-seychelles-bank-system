@@ -88,24 +88,24 @@ CREATE PROCEDURE Create_Fixed_Deposit (
   IN p_Balance DECIMAL(10, 2),
   IN p_Account_ID INT, -- The ID of the savings account
   IN p_FD_plan_id INT -- Reference to the FD plan
-) BEGIN DECLARE savings_account_id INT DEFAULT NULL;
+) BEGIN DECLARE v_savings_account_id INT DEFAULT NULL;
 
 -- To store the valid Savings_acc_id
 -- Check if the customer has the specified savings account
 SELECT
-  Acc_id INTO savings_account_id
+  SA.Savings_acc_id INTO v_savings_account_id
 FROM
-  Account
+  Account A
+  JOIN Savings_Account SA ON A.Acc_id = SA.Acc_id
 WHERE
-  Acc_id = p_Account_ID
-  AND Customer_id = p_CustomerId
-  AND Type = 'Savings';
+  A.Acc_id = p_Account_ID
+  AND A.Customer_id = p_CustomerId;
 
 -- Assuming the savings account type is 'Savings'
 -- If no valid savings account is found, raise an error
-IF savings_account_id IS NULL THEN SIGNAL SQLSTATE '45000'
+IF v_savings_account_id IS NULL THEN SIGNAL SQLSTATE '45000'
 SET
-  MESSAGE_TEXT = 'No valid savings account found for this customer.';
+  MESSAGE_TEXT = 'Invalid savings account for this customer.';
 
 ELSE
 -- Insert into Fixed_Deposit table if validation passes
@@ -123,7 +123,7 @@ VALUES
     p_BranchId,
     p_CustomerId,
     p_Balance,
-    p_Account_ID,
+    v_savings_account_id,
     NOW(),
     p_FD_plan_id
   );

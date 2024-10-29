@@ -22,6 +22,20 @@ import processLoanRequest from "./api/v1/handlers/loan/request/process.js";
 import userProfile from "./api/v1/handlers/profile/user.js";
 import organizationProfile from "./api/v1/handlers/profile/organization.js";
 import employeeProfile from "./api/v1/handlers/profile/employee.js";
+import listSavingsAccounts from "./api/v1/handlers/account/savings/list.js";
+import createSavingsAccount from "./api/v1/handlers/account/savings/create.js";
+import savingsAccountPlans from "./api/v1/handlers/account/savings/plans.js";
+import listCheckingAccounts from "./api/v1/handlers/account/checking/list.js";
+import createCheckingAccount from "./api/v1/handlers/account/checking/create.js";
+import accountWithdraw from "./api/v1/handlers/account/withdraw.js";
+import accountDeposit from "./api/v1/handlers/account/deposit.js";
+import accountTransfer from "./api/v1/handlers/account/transfer.js";
+import accountTransactionHistory from "./api/v1/handlers/account/transferHistory.js";
+import createFixedDeposit from "./api/v1/handlers/fixedDeposit/create.js";
+import listFixedDeposits from "./api/v1/handlers/fixedDeposit/list.js";
+import fixedDepositPlans from "./api/v1/handlers/fixedDeposit/plans.js";
+import branchWiseTotalTransactionsReport from "./api/v1/handlers/report/branchWiseTotalTransactions.js";
+import branchWiseLateLoanInstallmentsReport from "./api/v1/handlers/report/branchWiseLateLoanInstallments.js";
 
 const app = express();
 
@@ -40,11 +54,25 @@ const api = new OpenAPIBackend({
     userProfile,
     organizationProfile,
     employeeProfile,
+    accountWithdraw,
+    accountDeposit,
+    accountTransfer,
+    accountTransactionHistory,
+    listSavingsAccounts,
+    createSavingsAccount,
+    savingsAccountPlans,
+    listCheckingAccounts,
+    createCheckingAccount,
+    createFixedDeposit,
+    listFixedDeposits,
+    fixedDepositPlans,
     createLoanRequest,
     listLoans,
     listLoanRequests,
     processLoanRequest,
     selfApply,
+    branchWiseTotalTransactionsReport,
+    branchWiseLateLoanInstallmentsReport,
     validationFail,
     notFound,
     methodNotAllowed,

@@ -19,46 +19,31 @@ VALUES
 END;
 
 -- Max_Withdraw_Amount Function: Returns the maximum amount that can be withdrawn from an account, null if there is no limit.
-CREATE FUNCTION Max_Withdraw_Amount (Acc_id INT) RETURNS DECIMAL(10, 2) BEGIN DECLARE Acc_type ENUM('Savings', 'Checking');
-
-DECLARE Acc_balance DECIMAL(10, 2);
+CREATE FUNCTION Max_Withdraw_Amount (p_Acc_id INT) RETURNS DECIMAL(10, 2) BEGIN DECLARE Acc_balance DECIMAL(10, 2);
 
 DECLARE Min_balance DECIMAL(10, 2);
 
 SELECT
-  Type,
-  Balance INTO Acc_type,
-  Acc_balance
+  Balance,
+  Min_balance INTO Acc_balance,
+  Min_balance
 FROM
-  Account
+  Account A
+  LEFT JOIN Savings_Account S ON A.Acc_id = S.Acc_id
+  LEFT JOIN SA_plan Sp ON S.SA_plan_id = Sp.SA_plan_id
 WHERE
-  Account.Acc_id = Acc_id;
+  A.Acc_id = p_Acc_id;
 
-IF Acc_type = 'Savings' THEN
-SELECT
-  Min_balance INTO Min_balance
-FROM
-  SA_plan
-WHERE
-  SA_plan_id = (
-    SELECT
-      SA_plan_id
-    FROM
-      Savings_Account
-    WHERE
-      Savings_Account.Acc_id = Acc_id
-  );
+IF Min_balance IS NULL THEN
+RETURN Acc_balance;
+
+END IF;
 
 IF Acc_balance > Min_balance THEN
 RETURN Acc_balance - Min_balance;
 
 ELSE
 RETURN 0.00;
-
-END IF;
-
-ELSE
-RETURN Acc_balance;
 
 END IF;
 
