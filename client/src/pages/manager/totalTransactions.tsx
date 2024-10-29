@@ -18,9 +18,6 @@ import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
-  // DropdownMenuItem,
-  // DropdownMenuLabel,
-  // DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
@@ -33,50 +30,6 @@ import {
 } from "@/components/ui/table";
 import { BranchWiseTransaction } from "@/api/types";
 import { getBranchWiseTotalTransactionsReport } from "@/api/reports";
-
-//sample data
-// const data: Transactions[] = [
-//   {
-//     date: new Date("2023-01-01"),
-//     transactionId: "TXN001",
-//     accId: "ACC123",
-//     transactionType: "Credit",
-//     activityType: "Deposit",
-//     amount: 1000,
-//   },
-//   {
-//     date: new Date("2023-01-02"),
-//     transactionId: "TXN002",
-//     accId: "ACC124",
-//     transactionType: "Debit",
-//     activityType: "Withdrawal",
-//     amount: 500,
-//   },
-//   {
-//     date: new Date("2023-01-03"),
-//     transactionId: "TXN003",
-//     accId: "ACC125",
-//     transactionType: "Credit",
-//     activityType: "Transfer",
-//     amount: 1500,
-//   },
-//   {
-//     date: new Date("2023-01-04"),
-//     transactionId: "TXN004",
-//     accId: "ACC126",
-//     transactionType: "Debit",
-//     activityType: "Payment",
-//     amount: 200,
-//   },
-//   {
-//     date: new Date("2023-01-05"),
-//     transactionId: "TXN005",
-//     accId: "ACC127",
-//     transactionType: "Credit",
-//     activityType: "Deposit",
-//     amount: 2500,
-//   },
-// ];
 
 export const columns: ColumnDef<BranchWiseTransaction>[] = [
   {
@@ -316,10 +269,6 @@ export function TotalTransactions() {
             </Table>
           </div>
           <div className="flex items-center justify-end space-x-2 py-4">
-            {/* <div className="flex-1 text-sm text-muted-foreground">
-              {table.getFilteredSelectedRowModel().rows.length} of{" "}
-              {table.getFilteredRowModel().rows.length} row(s) selected.
-            </div> */}
             <div className="space-x-2">
               <Button
                 variant="outline"

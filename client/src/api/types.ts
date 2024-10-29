@@ -43,3 +43,14 @@ export interface BranchWiseTransaction {
   amount: number;
   date: string;
 }
+
+export interface BranchWiseLateLoanInstallment {
+  id: number;
+  loanAmount: number;
+  customerId: number;
+  loanType: string;
+  loanStartDate: string;
+  loanEndDate: string;
+  amount: number;
+  dueDate: string;
+}
