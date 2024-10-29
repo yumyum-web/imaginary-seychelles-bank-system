@@ -8,18 +8,5 @@
   "keywords": [],
   "author": "",
   "license": "GPL-3.0",
-  "devDependencies": {
-    "prettier": "^3.3.3",
-    "prettier-plugin-sql": "^0.18.1"
-  },
-  "lint-staged": {
-    "*.sql": "prettier --write"
-  },
-  "prettier": {
-    "plugins": [
-      "prettier-plugin-sql"
-    ],
-    "language": "mysql",
-    "keywordCase": "upper"
-  }
+  "devDependencies": {}
 }
