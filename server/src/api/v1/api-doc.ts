@@ -1299,6 +1299,67 @@ const apiDoc: OpenAPIV3.Document = {
         },
       },
     },
+    "/report/branchWiseLateLoanInstallments": {
+      get: {
+        summary: "Get branch wise late loan installments report",
+        operationId: "branchWiseLateLoanInstallmentsReport",
+        security: [
+          {
+            jwt: ["manager"],
+          },
+        ],
+        responses: {
+          200: {
+            description: "Branch wise late loan installments report retrieved",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "array",
+                  items: {
+                    type: "object",
+                    properties: {
+                      id: { type: "number" },
+                      loanAmount: { type: "number", format: "float" },
+                      customerId: { type: "number" },
+                      loanType: { type: "string" },
+                      loanStartDate: { type: "string" },
+                      loanEndDate: { type: "string" },
+                      amount: { type: "number", format: "float" },
+                      dueDate: { type: "string" },
+                    },
+                    required: [
+                      "id",
+                      "loanAmount",
+                      "customerId",
+                      "loanType",
+                      "loanStartDate",
+                      "loanEndDate",
+                      "amount",
+                      "dueDate",
+                    ],
+                  },
+                },
+              },
+            },
+          },
+          500: {
+            description:
+              "Failed to retrieve branch wise late loan installments report",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    message: { type: "string" },
+                  },
+                  required: ["message"],
+                },
+              },
+            },
+          },
+        },
+      },
+    },
   },
   components: {
     responses: {
