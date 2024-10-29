@@ -87,7 +87,7 @@ export function AccountOverview() {
                 ACC - {account.id}
               </CardTitle>
               <Badge className="text-xs bg-muted text-muted-foreground">
-                Savings
+                Checking
               </Badge>
             </CardHeader>
             <CardContent>
