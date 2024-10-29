@@ -1036,6 +1036,52 @@ const apiDoc: OpenAPIV3.Document = {
         },
       },
     },
+    "/loan/pendingInstallments": {
+      get: {
+        summary: "Get pending loan installments",
+        operationId: "pendingLoanInstallments",
+        security: [
+          {
+            jwt: ["customer"],
+          },
+        ],
+        responses: {
+          200: {
+            description: "Pending loan installments retrieved successfully",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "array",
+                  items: {
+                    type: "object",
+                    properties: {
+                      id: { type: "number" },
+                      amount: { type: "number", format: "float" },
+                      dueDate: { type: "string" },
+                    },
+                    required: ["id", "amount", "dueDate"],
+                  },
+                },
+              },
+            },
+          },
+          500: {
+            description: "Failed to retrieve pending loan installments",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    message: { type: "string" },
+                  },
+                  required: ["message"],
+                },
+              },
+            },
+          },
+        },
+      },
+    },
     "/loan/request/list": {
       get: {
         summary: "Get customer loan requests or branch loan requests",
