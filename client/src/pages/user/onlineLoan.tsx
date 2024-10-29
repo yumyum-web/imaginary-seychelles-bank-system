@@ -12,8 +12,8 @@ import {
   FormMessage,
   FormDescription,
 } from "@/components/ui/form";
-import { cn } from "@/lib/utils";
-import { CaretSortIcon, CheckIcon } from "@radix-ui/react-icons";
+//import { cn } from "@/lib/utils";
+//import { CaretSortIcon, CheckIcon } from "@radix-ui/react-icons";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -22,7 +22,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
+/*import {
   Popover,
   PopoverTrigger,
   PopoverContent,
@@ -34,24 +34,39 @@ import {
   CommandInput,
   CommandList,
   CommandEmpty,
-} from "@/components/ui/command";
-
+} from "@/components/ui/command";*/
+import onlineLoanRequestAPI from "@/api/onlineloan";
+import { useToast } from "@/hooks/use-toast";
+// Define form schema
+enum LoanType {
+  Business = "Business",
+  Personal = "Personal",
+}
 // Dummy account IDs for selection
-const dummyAccounts = [
+/*const dummyAccounts = [
   { id: "ACC123456", label: "Account 123456" },
   { id: "ACC654321", label: "Account 654321" },
   { id: "ACC112233", label: "Account 112233" },
-];
+];*/
 // Define form schema
 const formSchema = z.object({
-  acc_id: z.string().min(1, { message: "Account ID is required." }),
-  loan_type: z.enum(["Business", "Personal"], {
+  FDId: z.preprocess(
+    (value) => Number(value),
+    z.number().positive({ message: "FD ID must be a positive number." }),
+  ),
+  savingsAccountId: z.preprocess(
+    (value) => Number(value),
+    z
+      .number()
+      .positive({ message: "Savings Account ID must be a positive number." }),
+  ),
+  loanType: z.enum([LoanType.Business, LoanType.Personal], {
     required_error: "Loan type is required.",
   }),
   purpose: z
     .string()
     .min(10, { message: "Purpose must be at least 10 characters." }),
-  initial_deposit: z.preprocess(
+  amount: z.preprocess(
     (value) => parseFloat(value as string),
     z
       .number({
@@ -59,25 +74,48 @@ const formSchema = z.object({
       })
       .min(0, { message: "Amount must be a positive number." }),
   ),
+  timePeriod: z.preprocess(
+    (value) => Number(value), // Ensure timePeriod is converted to a number
+    z
+      .number({
+        invalid_type_error: "Time Period must be a number.",
+      })
+      .min(1, { message: "Time period must be at least 1 month." }),
+  ),
 });
 
 export function OnlineLoan() {
   // State for plan description
-
+  const { toast } = useToast();
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      acc_id: "",
-      loan_type: "",
+      FDId: 123,
+      savingsAccountId: 100,
+      loanType: LoanType.Business,
       purpose: "",
-      amount: "",
+      amount: 1,
+      timePeriod: 1,
     },
   });
 
-  // Submit handler
-  function onSubmit() {
-    console.log("Form submitted with data:");
-  }
+  const onSubmit = async (data: z.infer<typeof formSchema>) => {
+    try {
+      await onlineLoanRequestAPI(data);
+      toast({
+        title: "Success",
+        description: "Online loan has been approved!",
+        variant: "default",
+      });
+    } catch (error) {
+      console.error("Failed to approve online loan:", error);
+      toast({
+        title: "Error",
+        description: "Failed to approve online loan due to insufficient funds.",
+        variant: "destructive",
+      });
+    }
+  };
 
   return (
     <>
@@ -93,62 +131,15 @@ export function OnlineLoan() {
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
             <FormField
               control={form.control}
-              name="acc_id"
+              name="FDId"
               render={({ field }) => (
-                <FormItem className="flex flex-col">
-                  <FormLabel>Select FD</FormLabel>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <FormControl>
-                        <Button
-                          variant="outline"
-                          role="combobox"
-                          className={cn(
-                            "justify-between",
-                            !field.value && "text-muted-foreground",
-                          )}
-                        >
-                          {field.value
-                            ? dummyAccounts.find(
-                                (account) => account.id === field.value,
-                              )?.label
-                            : "Select account"}
-                          <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                        </Button>
-                      </FormControl>
-                    </PopoverTrigger>
-                    <PopoverContent className="p-0">
-                      <Command>
-                        <CommandInput placeholder="Search account..." />
-                        <CommandList>
-                          <CommandEmpty>No account found.</CommandEmpty>
-                          <CommandGroup heading="accounts">
-                            {dummyAccounts.map((account) => (
-                              <CommandItem
-                                value={account.label}
-                                key={account.id}
-                                onSelect={() => {
-                                  form.setValue("acc_id", account.id); // Set account description
-                                }}
-                              >
-                                <CheckIcon
-                                  className={cn(
-                                    "mr-2 h-4 w-4",
-                                    account.id === field.value
-                                      ? "opacity-100"
-                                      : "opacity-0",
-                                  )}
-                                />
-                                {account.label}
-                              </CommandItem>
-                            ))}
-                          </CommandGroup>
-                        </CommandList>
-                      </Command>
-                    </PopoverContent>
-                  </Popover>
+                <FormItem>
+                  <FormLabel>Enter Fixed Deposit ID</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Customer" {...field} />
+                  </FormControl>
                   <FormDescription>
-                    This is the fixed deposit you apply loan for
+                    Fixed Deposit ID required for online loan application.
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -156,7 +147,24 @@ export function OnlineLoan() {
             />
             <FormField
               control={form.control}
-              name="loan_type"
+              name="savingsAccountId"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Enter Savings Account ID</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Customer" {...field} />
+                  </FormControl>
+                  <FormDescription>
+                    Savings Account Id required for online loan application.
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="loanType"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Loan Type</FormLabel>

@@ -20,45 +20,74 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-
+import createLoanRequestAPI from "@/api/loanrequest";
+import { useToast } from "@/hooks/use-toast";
 // Define form schema
+enum LoanType {
+  Business = "Business",
+  Personal = "Personal",
+}
 const formSchema = z.object({
-  customer_id: z.string().min(1, { message: "Customer ID is required." }),
-  account_id: z.string().min(1, { message: "Account ID is required." }),
-  loan_type: z.enum(["Business", "Personal"], {
+  accountId: z.preprocess(
+    (value) => Number(value),
+    z.number().positive({ message: "Account ID must be a positive number." }),
+  ),
+  loanType: z.enum([LoanType.Business, LoanType.Personal], {
     required_error: "Loan type is required.",
   }),
   purpose: z
     .string()
     .min(10, { message: "Purpose must be at least 10 characters." }),
-  initial_deposit: z.preprocess(
+  loanAmount: z.preprocess(
     (value) => parseFloat(value as string),
     z
       .number({
         invalid_type_error: "Amount must be a number.",
       })
-      .min(0, { message: "aAmount must be a positive number." }),
+      .min(0, { message: "Amount must be a positive number." }),
+  ),
+  timePeriod: z.preprocess(
+    (value) => Number(value), // Ensure timePeriod is converted to a number
+    z
+      .number({
+        invalid_type_error: "Time Period must be a number.",
+      })
+      .min(1, { message: "Time period must be at least 1 month." }),
   ),
 });
 
 export function CreateLoanRequest() {
   // State for plan description
-
+  const { toast } = useToast();
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      customer_id: "",
-      account_id: "",
-      loan_type: "",
+      accountId: 100,
+      loanType: LoanType.Business,
       purpose: "",
-      amount: "",
+      loanAmount: 1,
+      timePeriod: 1,
     },
   });
 
   // Submit handler
-  function onSubmit() {
-    console.log("Form submitted with data:");
-  }
+  const onSubmit = async (data: z.infer<typeof formSchema>) => {
+    try {
+      await createLoanRequestAPI(data);
+      toast({
+        title: "Success",
+        description: "Loan request created successfully!",
+        variant: "default",
+      });
+    } catch (error) {
+      console.error("Failed to create loan request:", error);
+      toast({
+        title: "Error",
+        description: "Failed to create loan request.",
+        variant: "destructive",
+      });
+    }
+  };
 
   return (
     <>
@@ -77,24 +106,7 @@ export function CreateLoanRequest() {
             {/* Customer ID Field */}
             <FormField
               control={form.control}
-              name="customer_id"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Enter Customer ID</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Customer" {...field} />
-                  </FormControl>
-                  <FormDescription>
-                    This is the customer ID of the customer you want to create a
-                    new loan request.
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="account_id"
+              name="accountId"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Enter Account ID</FormLabel>
@@ -111,7 +123,7 @@ export function CreateLoanRequest() {
             />
             <FormField
               control={form.control}
-              name="loan_type"
+              name="loanType"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Loan Type</FormLabel>
@@ -161,7 +173,7 @@ export function CreateLoanRequest() {
 
             <FormField
               control={form.control}
-              name="amount"
+              name="loanAmount"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Loan Amount</FormLabel>
@@ -176,6 +188,29 @@ export function CreateLoanRequest() {
                     />
                   </FormControl>
                   <FormDescription>The requested loan amount.</FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="timePeriod"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Settlement Period</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="Settlement Period of Loan"
+                      {...field}
+                      value={field.value !== undefined ? field.value : ""}
+                      onChange={(e) => {
+                        field.onChange(e.target.value);
+                      }}
+                    />
+                  </FormControl>
+                  <FormDescription>
+                    The settlement period of requested loan.
+                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}

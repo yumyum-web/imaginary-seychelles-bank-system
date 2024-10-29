@@ -16,10 +16,14 @@ export interface Transactions {
   amount: number;
 }
 
+export enum LoanType {
+  Personal = "Personal",
+  Business = "Business",
+}
 export interface loanRequests {
-  requestId: string;
-  accId: string;
-  type: string;
+  id: number;
+  customerId: number;
+  type: LoanType;
   purpose: string;
   amount: number;
 }
