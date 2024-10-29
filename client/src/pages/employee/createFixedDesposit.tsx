@@ -1,10 +1,10 @@
-import { useState } from "react"; // Import useState hook
+import { useEffect, useState } from "react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { cn } from "@/lib/utils";
 import { CaretSortIcon, CheckIcon } from "@radix-ui/react-icons";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/custom/button";
 import { Separator } from "@/components/ui/separator";
 import {
   Form,
@@ -29,51 +29,82 @@ import {
   CommandList,
   CommandEmpty,
 } from "@/components/ui/command";
+import { FixedDepositPlan } from "@/api/types";
+import { getFixedDepositPlans } from "@/api/plans";
+import { createFixedDeposit } from "@/api/create";
+import { toast } from "@/hooks/use-toast";
 
-// Updated plans array with the minimum property
-const plans = [
-  { value: "1", label: "6 months", constraint: "6 months 13%" },
-  { value: "2", label: "1 year", constraint: "1 year 14%" },
-  {
-    value: "3",
-    label: "3 years",
-    constraint: "3 years 15%",
-  },
-] as const;
-
-// Define form schema
 const formSchema = z.object({
   customer_id: z.string().min(1, { message: "Customer ID is required." }),
   account_id: z.string().min(1, { message: "Savings Account is required" }),
-  account_plan: z
-    .string()
-    .min(1, { message: "Please select an account plan." }),
+  plan_id: z.string().min(1, { message: "Please select an account plan." }),
   deposit: z.preprocess(
-    (value) => parseFloat(value as string),
+    (value) => (typeof value === "string" ? parseFloat(value) : value),
     z
       .number({
         invalid_type_error: "Initial deposit must be a number.",
       })
-      .min(0, { message: "Initial deposit must be a positive number." }),
+      .min(1, { message: "Initial deposit must be a positive number." }),
   ),
 });
 
 export function CreateFixedDeposit() {
   const [planDescription, setPlanDescription] = useState(""); // State for plan description
+  const [fixedDepositPlans, setFixedDepositPlans] = useState<
+    FixedDepositPlan[]
+  >([]);
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchFixedDepositPlans = async () => {
+      try {
+        const plans = await getFixedDepositPlans();
+        setFixedDepositPlans(plans);
+      } catch (error) {
+        console.error("Error fetching savings account plans:", error);
+      }
+    };
+    fetchFixedDepositPlans();
+  }, []);
 
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
       customer_id: "",
       account_id: "",
-      account_plan: "",
-      deposit: "",
+      plan_id: "",
+      deposit: 0,
     },
   });
 
   // Submit handler
-  function onSubmit() {
-    console.log("Form submitted with data:");
+  async function onSubmit(data: z.infer<typeof formSchema>) {
+    setIsLoading(true);
+    try {
+      const message = await createFixedDeposit(
+        parseInt(data.customer_id),
+        data.deposit,
+        parseInt(data.account_id),
+        parseInt(data.plan_id),
+      );
+
+      toast({
+        title: "Success",
+        description: message,
+      });
+
+      form.reset();
+    } catch (error) {
+      toast({
+        title: "Error",
+        description:
+          (error as { message?: string })?.message ||
+          "Failed to create checkings account",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   return (
@@ -130,7 +161,7 @@ export function CreateFixedDeposit() {
             {/* Account Plan Field */}
             <FormField
               control={form.control}
-              name="account_plan"
+              name="plan_id"
               render={({ field }) => (
                 <FormItem className="flex flex-col">
                   <FormLabel>Account Plan</FormLabel>
@@ -141,46 +172,47 @@ export function CreateFixedDeposit() {
                           variant="outline"
                           role="combobox"
                           className={cn(
-                            "w-[200px] justify-between",
+                            "justify-between",
                             !field.value && "text-muted-foreground",
                           )}
                         >
                           {field.value
-                            ? plans.find((plan) => plan.value === field.value)
-                                ?.label
+                            ? fixedDepositPlans.find(
+                                (plan) => plan.id === Number(field.value),
+                              )?.duration + " months"
                             : "Select plan"}
                           <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                         </Button>
                       </FormControl>
                     </PopoverTrigger>
-                    <PopoverContent className="w-[200px] p-0">
+                    <PopoverContent className="p-0">
                       <Command>
                         <CommandInput placeholder="Search plan..." />
                         <CommandList>
                           <CommandEmpty>No plan found.</CommandEmpty>
                           <CommandGroup heading="Plans">
-                            {plans.map((plan) => (
+                            {fixedDepositPlans.map((plan) => (
                               <CommandItem
-                                value={plan.label}
-                                key={plan.value}
+                                value={plan.id.toString()}
+                                key={plan.id}
                                 onSelect={() => {
-                                  form.setValue("account_plan", plan.value);
-                                  setPlanDescription(plan.constraint); // Set plan description
-                                  console.log(
-                                    "Account Plan set to:",
-                                    plan.value,
-                                  );
+                                  form.setValue("plan_id", plan.id.toString()); // Set the plan ID
+                                  setPlanDescription(
+                                    "Interest Rate: " +
+                                      (plan.interestRate * 100).toFixed(2) +
+                                      "%",
+                                  ); // Set plan description
                                 }}
                               >
                                 <CheckIcon
                                   className={cn(
                                     "mr-2 h-4 w-4",
-                                    plan.value === field.value
+                                    plan.id === Number(field.value)
                                       ? "opacity-100"
                                       : "opacity-0",
                                   )}
                                 />
-                                {plan.label}
+                                {plan.duration + " months"}
                               </CommandItem>
                             ))}
                           </CommandGroup>
@@ -228,7 +260,9 @@ export function CreateFixedDeposit() {
               )}
             />
 
-            <Button type="submit">Create FD</Button>
+            <Button type="submit" className="mt-2 text-md" loading={isLoading}>
+              {isLoading ? "Creating..." : "Create"}
+            </Button>
           </form>
         </Form>
       </div>
