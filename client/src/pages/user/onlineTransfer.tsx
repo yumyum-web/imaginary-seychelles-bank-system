@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/custom/button";
 import { Separator } from "@/components/ui/separator";
 import {
   Form,
@@ -28,13 +28,19 @@ import {
   CommandList,
   CommandEmpty,
 } from "@/components/ui/command";
+import { useEffect, useState } from "react";
+import {
+  listCheckingAccounts,
+  listSavingsAccounts,
+  transferMoney,
+} from "@/api/accounts";
+import { useToast } from "@/hooks/use-toast";
 
-// Dummy account IDs for selection
-const dummyAccounts = [
-  { id: "ACC123456", label: "Account 123456" },
-  { id: "ACC654321", label: "Account 654321" },
-  { id: "ACC112233", label: "Account 112233" },
-];
+interface Account {
+  id: string;
+  label: string;
+}
+
 // Define form schema
 const formSchema = z.object({
   from_acc_id: z.string().min(1, { message: "Account ID is required." }),
@@ -50,18 +56,75 @@ const formSchema = z.object({
 });
 
 export function OnlineTransfer() {
+  const [accounts, setAccounts] = useState<Account[]>([]);
+  const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(false); // Loading state for submit button
+
+  useEffect(() => {
+    const fetchAccounts = async () => {
+      try {
+        const savingsAccounts = await listSavingsAccounts();
+        const checkingAccounts = await listCheckingAccounts();
+
+        const fetchedAccounts: Account[] = [];
+        savingsAccounts.forEach((account) => {
+          fetchedAccounts.push({
+            id: account.id.toString(),
+            label: `${account.id} - ${account.branchName}`,
+          });
+        });
+        checkingAccounts.forEach((account) => {
+          fetchedAccounts.push({
+            id: account.id.toString(),
+            label: `${account.id} - ${account.branchName}`,
+          });
+        });
+
+        setAccounts(fetchedAccounts);
+      } catch (error) {
+        console.error("Error fetching accounts:", error);
+      }
+    };
+
+    fetchAccounts();
+  }, []);
+
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
       from_acc_id: "",
       to_acc_id: "",
-      amount: "",
+      amount: 0,
     },
   });
 
   // Submit handler
-  function onSubmit(data) {
-    console.log("Form submitted with data:", data);
+  async function onSubmit(data: z.infer<typeof formSchema>) {
+    setIsLoading(true);
+    try {
+      const message = await transferMoney(
+        parseInt(data.from_acc_id),
+        parseInt(data.to_acc_id),
+        data.amount,
+      );
+
+      toast({
+        title: "Transfer Successful",
+        description: message,
+      });
+
+      form.reset();
+    } catch (error) {
+      toast({
+        title: "Transfer Failed",
+        description:
+          (error as { message?: string })?.message ||
+          "An error occurred while transferring money.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   return (
@@ -96,9 +159,8 @@ export function OnlineTransfer() {
                           )}
                         >
                           {field.value
-                            ? dummyAccounts.find(
-                                (account) => account.id === field.value,
-                              )?.label
+                            ? accounts.find((acc) => acc.id === field.value)
+                                ?.label
                             : "Select account"}
                           <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                         </Button>
@@ -110,23 +172,23 @@ export function OnlineTransfer() {
                         <CommandList>
                           <CommandEmpty>No account found.</CommandEmpty>
                           <CommandGroup heading="accounts">
-                            {dummyAccounts.map((account) => (
+                            {accounts.map((acc) => (
                               <CommandItem
-                                value={account.label}
-                                key={account.id}
+                                value={acc.label}
+                                key={acc.id}
                                 onSelect={() => {
-                                  form.setValue("from_acc_id", account.id); // Set account description
+                                  form.setValue("from_acc_id", acc.id);
                                 }}
                               >
                                 <CheckIcon
                                   className={cn(
                                     "mr-2 h-4 w-4",
-                                    account.id === field.value
+                                    acc.id === field.value
                                       ? "opacity-100"
                                       : "opacity-0",
                                   )}
                                 />
-                                {account.label}
+                                {acc.label}
                               </CommandItem>
                             ))}
                           </CommandGroup>
@@ -142,7 +204,6 @@ export function OnlineTransfer() {
                 </FormItem>
               )}
             />
-            {/* Customer ID Field */}
             <FormField
               control={form.control}
               name="to_acc_id"
@@ -161,7 +222,6 @@ export function OnlineTransfer() {
               )}
             />
 
-            {/* Initial Deposit Field */}
             <FormField
               control={form.control}
               name="amount"
@@ -186,7 +246,9 @@ export function OnlineTransfer() {
               )}
             />
 
-            <Button type="submit">Transfer</Button>
+            <Button type="submit" className="mt-2 text-md" loading={isLoading}>
+              {isLoading ? "Transferring..." : "Transfer"}
+            </Button>
           </form>
         </Form>
       </div>
