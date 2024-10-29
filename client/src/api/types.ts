@@ -31,8 +31,6 @@ export type SavingsAccountPlan = {
 
 export type FixedDepositPlan = {
   id: number;
-  name: string;
   interestRate: number;
-  tenure: string; // e.g., "6 months", "1 year"
-  minimumDeposit: number;
+  duration: number;
 };
