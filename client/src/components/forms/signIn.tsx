@@ -17,7 +17,7 @@ import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast"; // Import the toast hook
 import { login } from "@/api/auth"; // Import the login API function
 import { useUser } from "@/contexts/useUser";
-import { useNavigate } from "react-router-dom";
+// import { useNavigate } from "react-router-dom";
 
 // Define schema for validation
 const formSchema = z.object({
@@ -36,11 +36,11 @@ export function UserAuthForm({
   className,
   ...props
 }: HTMLAttributes<HTMLDivElement>) {
-  const { setUserLevels } = useUser();
+  const { setUserLevels, setToken, setUserType } = useUser();
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast(); // Destructure toast from useToast hook
 
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   // Initialize form with zod validation
   const form = useForm<z.infer<typeof formSchema>>({
@@ -60,8 +60,20 @@ export function UserAuthForm({
 
       // Store token in localStorage or handle as needed
       sessionStorage.setItem("token", response.token);
+      sessionStorage.setItem(
+        "userLevels",
+        JSON.stringify(response.user.levels),
+      );
+
+      const userType = response.user.customer
+        ? response.user.customer.type
+        : "employee";
+      sessionStorage.setItem("userType", userType);
+
+      setToken(response.token);
       setUserLevels(response.user.levels);
-      navigate("/manager");
+      setUserType(userType);
+
       toast({
         title: "Login Successful",
         description: "Welcome back!",

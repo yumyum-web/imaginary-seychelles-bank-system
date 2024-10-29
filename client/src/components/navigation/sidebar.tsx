@@ -11,7 +11,7 @@ import {
   userLinks,
 } from "@/routes/navlinks";
 import { useUser } from "@/contexts/useUser";
-
+import { Employee, Individual, Organization } from "@/contexts/types";
 interface SidebarProps extends React.HTMLAttributes<HTMLElement> {
   isCollapsed: boolean;
   setIsCollapsed: React.Dispatch<React.SetStateAction<boolean>>;
@@ -23,6 +23,7 @@ export default function Sidebar({
   setIsCollapsed,
 }: SidebarProps) {
   const { user, userLevels } = useUser(); // Use userLevels instead of user.type
+  const [title, setTitle] = useState<string | null>(null);
   const [navOpened, setNavOpened] = useState(false);
 
   /* Make body not scrollable when navBar is opened */
@@ -53,6 +54,22 @@ export default function Sidebar({
     // You might need to use useNavigate here if necessary
     links = []; // Or provide default links
   }
+
+  useEffect(() => {
+    if (userLevels?.includes("manager")) {
+      setTitle("Manager Dashboard");
+    } else if (userLevels?.includes("employee")) {
+      if ((user as Employee)?.position) {
+        setTitle((user as Employee).position);
+      }
+    } else if (userLevels?.includes("user")) {
+      if (user as Individual) {
+        setTitle("Customer Dashboard");
+      } else if (user as Organization) {
+        setTitle("Organization Dashboard");
+      }
+    }
+  }, [userLevels, user]);
 
   return (
     <aside
@@ -115,8 +132,12 @@ export default function Sidebar({
                 isCollapsed ? "invisible w-0" : "visible w-auto"
               }`}
             >
-              <span className="font-medium">{user?.type} Dashboard</span>
-              <span className="text-xs">{user?.branch} Branch</span>
+              <span className="font-medium">{title}</span>
+              <span className="text-xs">
+                {(user as Employee)?.branchName
+                  ? `${(user as Employee).branchName}`
+                  : ""}
+              </span>
             </div>
           </div>
 

@@ -35,3 +35,15 @@ export async function login(credentials: LoginRequest): Promise<LoginResponse> {
     throw error.response?.data || new Error("Login failed");
   }
 }
+
+export async function logout(): Promise<void> {
+  try {
+    sessionStorage.removeItem("token");
+    sessionStorage.removeItem("userLevels");
+    window.location.reload();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
+    // Handle error appropriately, or rethrow for further handling
+    throw error.response?.data || new Error("Logout failed");
+  }
+}
