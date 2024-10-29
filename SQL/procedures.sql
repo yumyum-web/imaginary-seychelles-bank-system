@@ -301,6 +301,21 @@ CREATE PROCEDURE Create_Loan (
 
 DECLARE v_time_period INT;
 
+DECLARE i INT DEFAULT 0;
+
+DECLARE v_installment_amount DECIMAL(10, 2);
+
+-- Error handling
+DECLARE EXIT
+    HANDLER FOR SQLEXCEPTION BEGIN
+    ROLLBACK;
+
+    RESIGNAL;
+
+END;
+
+START TRANSACTION;
+
 -- Calculate the time period in months
 SET
   v_time_period = PERIOD_DIFF(
@@ -354,13 +369,10 @@ VALUES
   );
 
 -- Calculate and insert monthly installments
-DECLARE i INT DEFAULT 0;
-
-DECLARE v_installment_amount DECIMAL(10, 2);
 
 SET
   v_installment_amount = ROUND(
-    (p_loan_amount + (p_loan_amount * p_interest_rate)) / v_time_period,
+    ((p_loan_amount + (p_loan_amount * p_interest_rate)) / v_time_period),
     2
   );
 
@@ -387,6 +399,8 @@ CALL Deposit (p_account_id, p_loan_amount, v_activity_id);
 -- Indicate successful creation
 SELECT
   'Loan created successfully.' AS Message;
+
+COMMIT;
 
 END;
 
@@ -929,9 +943,9 @@ DECLARE interestAmount DECIMAL(10, 2);
 SELECT
   balance INTO currentBalance
 FROM
-  Accounts
+  Account
 WHERE
-  id = accountId;
+  Acc_id = accountId;
 
 -- Calculate the interest
 SET
