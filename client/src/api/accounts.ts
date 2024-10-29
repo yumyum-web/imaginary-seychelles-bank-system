@@ -71,7 +71,7 @@ export async function getTransactionHistory(
         headers: {
           Authorization: `Bearer ${token}`,
         },
-        data: { accountId: accountID },
+        params: { accountId: accountID },
       },
     );
     return response.data;

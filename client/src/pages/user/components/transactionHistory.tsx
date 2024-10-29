@@ -42,7 +42,7 @@ export const columns: ColumnDef<Transaction>[] = [
     },
   },
   {
-    accessorKey: "transactionId",
+    accessorKey: "id",
     header: ({ column }) => (
       <Button
         variant="ghost"
@@ -52,10 +52,10 @@ export const columns: ColumnDef<Transaction>[] = [
         <ArrowUpDown className="ml-2 h-4 w-4" />
       </Button>
     ),
-    cell: ({ row }) => <div>{row.getValue("transactionId")}</div>,
+    cell: ({ row }) => <div>{row.getValue("id")}</div>,
   },
   {
-    accessorKey: "transactionType",
+    accessorKey: "type",
     header: ({ column }) => (
       <Button
         variant="ghost"
@@ -65,7 +65,7 @@ export const columns: ColumnDef<Transaction>[] = [
         <ArrowUpDown className="ml-2 h-4 w-4" />
       </Button>
     ),
-    cell: ({ row }) => <div>{row.getValue("transactionType")}</div>,
+    cell: ({ row }) => <div>{row.getValue("type")}</div>,
   },
   {
     accessorKey: "activityType",
