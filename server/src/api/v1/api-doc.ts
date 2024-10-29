@@ -599,9 +599,6 @@ const apiDoc: OpenAPIV3.Document = {
               schema: {
                 type: "object",
                 properties: {
-                  customerId: {
-                    type: "number",
-                  },
                   initialDeposit: {
                     type: "number",
                     format: "float",
@@ -614,7 +611,6 @@ const apiDoc: OpenAPIV3.Document = {
                   },
                 },
                 required: [
-                  "customerId",
                   "initialDeposit",
                   "savingsAccountId",
                   "fixedDepositPlanId",
