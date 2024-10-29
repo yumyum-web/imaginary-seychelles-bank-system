@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -18,9 +18,6 @@ import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
-  // DropdownMenuItem,
-  // DropdownMenuLabel,
-  // DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
@@ -31,75 +28,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Transactions } from "./types";
+import { BranchWiseTransaction } from "@/api/types";
+import { getBranchWiseTotalTransactionsReport } from "@/api/reports";
 
-//sample data
-const data: Transactions[] = [
-  {
-    date: new Date("2023-01-01"),
-    transactionId: "TXN001",
-    accId: "ACC123",
-    transactionType: "Credit",
-    activityType: "Deposit",
-    amount: 1000,
-  },
-  {
-    date: new Date("2023-01-02"),
-    transactionId: "TXN002",
-    accId: "ACC124",
-    transactionType: "Debit",
-    activityType: "Withdrawal",
-    amount: 500,
-  },
-  {
-    date: new Date("2023-01-03"),
-    transactionId: "TXN003",
-    accId: "ACC125",
-    transactionType: "Credit",
-    activityType: "Transfer",
-    amount: 1500,
-  },
-  {
-    date: new Date("2023-01-04"),
-    transactionId: "TXN004",
-    accId: "ACC126",
-    transactionType: "Debit",
-    activityType: "Payment",
-    amount: 200,
-  },
-  {
-    date: new Date("2023-01-05"),
-    transactionId: "TXN005",
-    accId: "ACC127",
-    transactionType: "Credit",
-    activityType: "Deposit",
-    amount: 2500,
-  },
-];
-
-export const columns: ColumnDef<Transactions>[] = [
-  //   {
-  //     id: "select",
-  //     header: ({ table }) => (
-  //       <Checkbox
-  //         checked={
-  //           table.getIsAllPageRowsSelected() ||
-  //           (table.getIsSomePageRowsSelected() && "indeterminate")
-  //         }
-  //         onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-  //         aria-label="Select all"
-  //       />
-  //     ),
-  //     cell: ({ row }) => (
-  //       <Checkbox
-  //         checked={row.getIsSelected()}
-  //         onCheckedChange={(value) => row.toggleSelected(!!value)}
-  //         aria-label="Select row"
-  //       />
-  //     ),
-  //     enableSorting: false,
-  //     enableHiding: false,
-  //   },
+export const columns: ColumnDef<BranchWiseTransaction>[] = [
   {
     accessorKey: "date",
     header: ({ column }) => {
@@ -119,7 +51,7 @@ export const columns: ColumnDef<Transactions>[] = [
     },
   },
   {
-    accessorKey: "transactionId",
+    accessorKey: "id",
     header: ({ column }) => {
       return (
         <Button
@@ -131,10 +63,10 @@ export const columns: ColumnDef<Transactions>[] = [
         </Button>
       );
     },
-    cell: ({ row }) => <div>{row.getValue("transactionId")}</div>,
+    cell: ({ row }) => <div>{row.getValue("id")}</div>,
   },
   {
-    accessorKey: "accId",
+    accessorKey: "accountId",
     header: ({ column }) => {
       return (
         <Button
@@ -146,10 +78,10 @@ export const columns: ColumnDef<Transactions>[] = [
         </Button>
       );
     },
-    cell: ({ row }) => <div>{row.getValue("accId")}</div>,
+    cell: ({ row }) => <div>{row.getValue("accountId")}</div>,
   },
   {
-    accessorKey: "transactionType",
+    accessorKey: "type",
     header: ({ column }) => {
       return (
         <Button
@@ -161,7 +93,7 @@ export const columns: ColumnDef<Transactions>[] = [
         </Button>
       );
     },
-    cell: ({ row }) => <div>{row.getValue("transactionType")}</div>,
+    cell: ({ row }) => <div>{row.getValue("type")}</div>,
   },
   {
     accessorKey: "activityType",
@@ -193,36 +125,6 @@ export const columns: ColumnDef<Transactions>[] = [
       return <div className="text-right font-medium">{formatted}</div>;
     },
   },
-
-  //   {
-  //     id: "actions",
-  //     enableHiding: false,
-  //     cell: ({ row }) => {
-  //       const payment = row.original
-
-  //       return (
-  //         <DropdownMenu>
-  //           <DropdownMenuTrigger asChild>
-  //             <Button variant="ghost" className="h-8 w-8 p-0">
-  //               <span className="sr-only">Open menu</span>
-  //               <MoreHorizontal className="h-4 w-4" />
-  //             </Button>
-  //           </DropdownMenuTrigger>
-  //           <DropdownMenuContent align="end">
-  //             <DropdownMenuLabel>Actions</DropdownMenuLabel>
-  //             <DropdownMenuItem
-  //               onClick={() => navigator.clipboard.writeText(payment.id)}
-  //             >
-  //               Copy payment ID
-  //             </DropdownMenuItem>
-  //             <DropdownMenuSeparator />
-  //             <DropdownMenuItem>View customer</DropdownMenuItem>
-  //             <DropdownMenuItem>View payment details</DropdownMenuItem>
-  //           </DropdownMenuContent>
-  //         </DropdownMenu>
-  //       )
-  //     },
-  //   },
 ];
 
 export function TotalTransactions() {
@@ -230,9 +132,25 @@ export function TotalTransactions() {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
+  const [branchWiseTransactions, setBranchWiseTransactions] = useState<
+    BranchWiseTransaction[]
+  >([]);
+
+  useEffect(() => {
+    const fetchTotalTransactions = async () => {
+      try {
+        const totalTransactions = await getBranchWiseTotalTransactionsReport();
+        setBranchWiseTransactions(totalTransactions);
+      } catch (error) {
+        console.error("Error fetching accounts:", error);
+      }
+    };
+
+    fetchTotalTransactions();
+  }, []);
 
   const table = useReactTable({
-    data,
+    data: branchWiseTransactions,
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -351,10 +269,6 @@ export function TotalTransactions() {
             </Table>
           </div>
           <div className="flex items-center justify-end space-x-2 py-4">
-            {/* <div className="flex-1 text-sm text-muted-foreground">
-              {table.getFilteredSelectedRowModel().rows.length} of{" "}
-              {table.getFilteredRowModel().rows.length} row(s) selected.
-            </div> */}
             <div className="space-x-2">
               <Button
                 variant="outline"

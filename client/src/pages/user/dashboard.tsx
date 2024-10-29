@@ -1,7 +1,5 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { AccountCards } from "./components/accountOverview";
-import { TransactionHistory } from "./components/transactionHistory";
+import { AccountOverview } from "./components/accountOverview";
 
 export default function Dashboard() {
   return (
@@ -22,18 +20,10 @@ export default function Dashboard() {
           </TabsList>
         </div>
         <TabsContent value="overview" className="space-y-4">
-          <AccountCards />
-          <div className="grid grid-cols-1 gap-4 lg:grid-cols-7">
-            <Card className="col-span-1 lg:col-span-12">
-              <CardHeader>
-                <CardTitle>Overview</CardTitle>
-              </CardHeader>
-              <CardContent className="pl-2"></CardContent>
-            </Card>
-          </div>
+          <AccountOverview />
         </TabsContent>
         <TabsContent value="transactions" className="space-y-4">
-          <TransactionHistory />
+          {/* <TransactionHistory /> */}
         </TabsContent>
       </Tabs>
     </>

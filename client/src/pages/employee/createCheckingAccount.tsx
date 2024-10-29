@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/custom/button";
 import { Separator } from "@/components/ui/separator";
 import {
   Form,
@@ -13,13 +13,13 @@ import {
   FormDescription,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { useToast } from "@/hooks/use-toast";
+import { useState } from "react";
+import { createCheckingAccount } from "@/api/create";
 
 // Define form schema
 const formSchema = z.object({
   customer_id: z.string().min(1, { message: "Customer ID is required." }),
-  account_plan: z
-    .string()
-    .min(1, { message: "Please select an account plan." }),
   initial_deposit: z.preprocess(
     (value) => parseFloat(value as string),
     z
@@ -31,18 +31,43 @@ const formSchema = z.object({
 });
 
 export function CreateCheckingsAccount() {
+  const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(false);
+
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
       customer_id: "",
-      account_plan: "",
-      initial_deposit: "",
+      initial_deposit: 0,
     },
   });
 
   // Submit handler
-  function onSubmit(data) {
-    console.log("Form submitted with data:", data);
+  async function onSubmit(data: z.infer<typeof formSchema>) {
+    setIsLoading(true);
+    try {
+      const message = await createCheckingAccount(
+        parseInt(data.customer_id),
+        data.initial_deposit,
+      );
+
+      toast({
+        title: "Success",
+        description: message,
+      });
+
+      form.reset();
+    } catch (error) {
+      toast({
+        title: "Error",
+        description:
+          (error as { message?: string })?.message ||
+          "Failed to create checkings account",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   return (
@@ -103,7 +128,9 @@ export function CreateCheckingsAccount() {
               )}
             />
 
-            <Button type="submit">Create Account</Button>
+            <Button type="submit" className="mt-2 text-md" loading={isLoading}>
+              {isLoading ? "Creating..." : "Create"}
+            </Button>
           </form>
         </Form>
       </div>
