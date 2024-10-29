@@ -1242,6 +1242,63 @@ const apiDoc: OpenAPIV3.Document = {
         },
       },
     },
+    "/report/branchWiseTotalTransactions": {
+      get: {
+        summary: "Get branch wise total transactions report",
+        operationId: "branchWiseTotalTransactionsReport",
+        security: [
+          {
+            jwt: ["manager"],
+          },
+        ],
+        responses: {
+          200: {
+            description: "Branch wise total transactions report retrieved",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "array",
+                  items: {
+                    type: "object",
+                    properties: {
+                      id: { type: "number" },
+                      type: { type: "string" },
+                      activityType: { type: "string" },
+                      accountId: { type: "number" },
+                      amount: { type: "number", format: "float" },
+                      date: { type: "string" },
+                    },
+                    required: [
+                      "id",
+                      "type",
+                      "activityType",
+                      "accountId",
+                      "amount",
+                      "date",
+                    ],
+                  },
+                },
+              },
+            },
+          },
+          500: {
+            description:
+              "Failed to retrieve branch wise total transactions report",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    message: { type: "string" },
+                  },
+                  required: ["message"],
+                },
+              },
+            },
+          },
+        },
+      },
+    },
   },
   components: {
     responses: {

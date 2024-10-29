@@ -34,6 +34,7 @@ import accountTransactionHistory from "./api/v1/handlers/account/transferHistory
 import createFixedDeposit from "./api/v1/handlers/fixedDeposit/create.js";
 import listFixedDeposits from "./api/v1/handlers/fixedDeposit/list.js";
 import fixedDepositPlans from "./api/v1/handlers/fixedDeposit/plans.js";
+import branchWiseTotalTransactionsReport from "./api/v1/handlers/report/branchWiseTotalTransactions.js";
 
 const app = express();
 
@@ -69,6 +70,7 @@ const api = new OpenAPIBackend({
     listLoanRequests,
     processLoanRequest,
     selfApply,
+    branchWiseTotalTransactionsReport,
     validationFail,
     notFound,
     methodNotAllowed,
