@@ -1,6 +1,11 @@
 // src/api/account.ts
 import api from "./api";
-import { CheckingAccount, SavingsAccount, Transaction } from "./types";
+import {
+  CheckingAccount,
+  FixedDeposit,
+  SavingsAccount,
+  Transaction,
+} from "./types";
 
 // Helper function to retrieve the JWT token from session storage
 function getAuthToken(): string | null {
@@ -34,7 +39,6 @@ export async function listCheckingAccounts(): Promise<CheckingAccount[]> {
 
 /**
  * Fetches the list of savings accounts for a specific customer.
- * @param {number} customerId - ID of the customer whose savings accounts to retrieve.
  * @returns {Promise<SavingsAccount[]>} - Array of savings accounts.
  */
 export async function listSavingsAccounts(): Promise<SavingsAccount[]> {
@@ -51,6 +55,32 @@ export async function listSavingsAccounts(): Promise<SavingsAccount[]> {
     throw (
       error.response?.data?.message ||
       new Error("Failed to retrieve savings accounts")
+    );
+  }
+}
+
+/**
+ * Fetches the list of fixed deposits, optionally filtered by customer ID.
+ * @param customerId - (Optional) ID of the customer to filter deposits.
+ * @returns {Promise<FixedDeposit[]>} - Array of fixed deposits.
+ */
+export async function listFixedDeposits(): Promise<FixedDeposit[]> {
+  try {
+    const token = getAuthToken();
+
+    const response = await api.get<FixedDeposit[]>("/fixedDeposit/list", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    return response.data;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
+    // Handle errors appropriately
+    throw (
+      error.response?.data?.message ||
+      new Error("Failed to retrieve fixed deposits")
     );
   }
 }

@@ -119,3 +119,56 @@ export async function processLoanRequest(
     );
   }
 }
+
+/**
+ * Applies for a loan on behalf of the customer.
+ * @param FDId - The ID of the fixed deposit.
+ * @param savingsAccountId - The ID of the savings account.
+ * @param loanType - Type of the loan ("Business" | "Personal").
+ * @param amount - Loan amount in float format.
+ * @param purpose - Purpose of the loan.
+ * @param timePeriod - Loan repayment time period.
+ * @returns {Promise<string>} - Success message upon loan application.
+ */
+export async function selfApplyForLoan(
+  FDId: number,
+  savingsAccountId: number,
+  loanType: "Business" | "Personal",
+  amount: number,
+  purpose: string,
+  timePeriod: number,
+): Promise<string> {
+  try {
+    const token = getAuthToken();
+
+    // Prepare the request payload
+    const payload = {
+      FDId,
+      savingsAccountId,
+      loanType,
+      amount,
+      purpose,
+      timePeriod,
+    };
+
+    // Send POST request to apply for the loan
+    const response = await api.post<{ message: string }>(
+      "/loan/selfApply",
+      payload,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      },
+    );
+
+    // Return the success message from the response
+    return response.data.message;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
+    throw (
+      error.response?.data?.message || new Error("Failed to apply for loan")
+    );
+  }
+}

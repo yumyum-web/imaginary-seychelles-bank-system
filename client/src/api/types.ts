@@ -65,3 +65,14 @@ export interface LoanRequest {
   status: "Pending" | "Approved" | "Rejected";
   timePeriod: number;
 }
+
+export interface FixedDeposit {
+  id: number;
+  balance: number;
+  planId: number;
+  interestRate: number;
+  duration: number;
+  openedDate: string;
+  branchId: number;
+  branchName: string;
+}
