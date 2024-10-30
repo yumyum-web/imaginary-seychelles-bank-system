@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -11,20 +11,15 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { ArrowUpDown, ChevronDown, MoreHorizontal } from "lucide-react";
+import { ArrowUpDown, ChevronDown } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
-  // DropdownMenuItem,
-  // DropdownMenuLabel,
-  // DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Input } from "@/components/ui/input";
 import {
   Table,
   TableBody,
@@ -33,77 +28,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { lateLoanInstallments } from "./types";
+import { BranchWiseLateLoanInstallment } from "@/api/types";
+import { getBranchWiseLateLoanInstallmentsReport } from "@/api/reports";
 
-//sample data
-const data: lateLoanInstallments[] = [
+export const columns: ColumnDef<BranchWiseLateLoanInstallment>[] = [
   {
-    loanId: "L001",
-    accId: "A001",
-    customerId: "C001",
-    type: "personal",
-    amount: 5000,
-    dueDate: new Date("2023-10-01"),
-  },
-  {
-    loanId: "L002",
-    accId: "A002",
-    customerId: "C002",
-    type: "home",
-    amount: 15000,
-    dueDate: new Date("2023-09-15"),
-  },
-  {
-    loanId: "L003",
-    accId: "A003",
-    customerId: "C003",
-    type: "auto",
-    amount: 8000,
-    dueDate: new Date("2023-08-20"),
-  },
-  {
-    loanId: "L004",
-    accId: "A004",
-    customerId: "C004",
-    type: "education",
-    amount: 12000,
-    dueDate: new Date("2023-07-30"),
-  },
-  {
-    loanId: "L005",
-    accId: "A005",
-    customerId: "C005",
-    type: "business",
-    amount: 20000,
-    dueDate: new Date("2023-06-25"),
-  },
-];
-
-export const columns: ColumnDef<lateLoanInstallments>[] = [
-  // {
-  //   id: "select",
-  //   header: ({ table }) => (
-  //     <Checkbox
-  //       checked={
-  //         table.getIsAllPageRowsSelected() ||
-  //         (table.getIsSomePageRowsSelected() && "indeterminate")
-  //       }
-  //       onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-  //       aria-label="Select all"
-  //     />
-  //   ),
-  //   cell: ({ row }) => (
-  //     <Checkbox
-  //       checked={row.getIsSelected()}
-  //       onCheckedChange={(value) => row.toggleSelected(!!value)}
-  //       aria-label="Select row"
-  //     />
-  //   ),
-  //   enableSorting: false,
-  //   enableHiding: false,
-  // },
-  {
-    accessorKey: "loanId",
+    accessorKey: "id",
     header: ({ column }) => {
       return (
         <Button
@@ -115,22 +45,7 @@ export const columns: ColumnDef<lateLoanInstallments>[] = [
         </Button>
       );
     },
-    cell: ({ row }) => <div>{row.getValue("loanId")}</div>,
-  },
-  {
-    accessorKey: "accId",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Account ID
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      );
-    },
-    cell: ({ row }) => <div>{row.getValue("accId")}</div>,
+    cell: ({ row }) => <div>{row.getValue("id")}</div>,
   },
   {
     accessorKey: "customerId",
@@ -148,7 +63,7 @@ export const columns: ColumnDef<lateLoanInstallments>[] = [
     cell: ({ row }) => <div>{row.getValue("customerId")}</div>,
   },
   {
-    accessorKey: "type",
+    accessorKey: "loanType",
     header: ({ column }) => {
       return (
         <Button
@@ -160,7 +75,7 @@ export const columns: ColumnDef<lateLoanInstallments>[] = [
         </Button>
       );
     },
-    cell: ({ row }) => <div>{row.getValue("type")}</div>,
+    cell: ({ row }) => <div>{row.getValue("loanType")}</div>,
   },
   {
     accessorKey: "dueDate",
@@ -195,35 +110,6 @@ export const columns: ColumnDef<lateLoanInstallments>[] = [
       return <div className="text-right font-medium">{formatted}</div>;
     },
   },
-  //   {
-  //     id: "actions",
-  //     enableHiding: false,
-  //     cell: ({ row }) => {
-  //       const payment = row.original
-
-  //       return (
-  //         <DropdownMenu>
-  //           <DropdownMenuTrigger asChild>
-  //             <Button variant="ghost" className="h-8 w-8 p-0">
-  //               <span className="sr-only">Open menu</span>
-  //               <MoreHorizontal className="h-4 w-4" />
-  //             </Button>
-  //           </DropdownMenuTrigger>
-  //           <DropdownMenuContent align="end">
-  //             <DropdownMenuLabel>Actions</DropdownMenuLabel>
-  //             <DropdownMenuItem
-  //               onClick={() => navigator.clipboard.writeText(payment.id)}
-  //             >
-  //               Copy payment ID
-  //             </DropdownMenuItem>
-  //             <DropdownMenuSeparator />
-  //             <DropdownMenuItem>View customer</DropdownMenuItem>
-  //             <DropdownMenuItem>View payment details</DropdownMenuItem>
-  //           </DropdownMenuContent>
-  //         </DropdownMenu>
-  //       )
-  //     },
-  //   },
 ];
 
 export function LateLoanInstallments() {
@@ -231,9 +117,25 @@ export function LateLoanInstallments() {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
+  const [BranchWiseLateLoanInstallments, setBranchWiseLateLoanInstallments] =
+    useState<BranchWiseLateLoanInstallment[]>([]);
+
+  useEffect(() => {
+    const fetchLateLoanInstallments = async () => {
+      try {
+        const lateLoanInstallments =
+          await getBranchWiseLateLoanInstallmentsReport();
+        setBranchWiseLateLoanInstallments(lateLoanInstallments);
+      } catch (error) {
+        console.error("Error fetching accounts:", error);
+      }
+    };
+
+    fetchLateLoanInstallments();
+  }, []);
 
   const table = useReactTable({
-    data,
+    data: BranchWiseLateLoanInstallments,
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,

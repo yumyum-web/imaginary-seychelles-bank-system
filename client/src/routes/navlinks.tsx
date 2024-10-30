@@ -34,19 +34,19 @@ export const managerLinks = [
   },
   {
     title: "Loan Requests",
-    label: "10",
+    label: "",
     href: "/manager/loan-requests",
     icon: <IconRouteAltLeft size={18} />,
   },
   {
     title: "Reports",
-    label: "10",
+    label: "",
     href: "/manager/reports",
     icon: <IconChartInfographic size={18} />,
     sub: [
       {
         title: "Transactions",
-        label: "9",
+        label: "",
         href: "/manager/total-transactions",
         icon: <IconTransfer size={18} />,
       },

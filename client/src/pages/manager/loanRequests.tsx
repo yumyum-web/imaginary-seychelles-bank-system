@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -24,7 +24,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Input } from "@/components/ui/input";
 import {
   Table,
   TableBody,
@@ -33,48 +32,38 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { loanRequests } from "./types";
+import { LoanRequest } from "@/api/types";
+import { listLoanRequests, processLoanRequest } from "@/api/loans";
+import { toast } from "@/hooks/use-toast";
 
-//sample data
-const data: loanRequests[] = [
-  {
-    requestId: "LR001",
-    accId: "ACC123",
-    type: "Personal",
-    purpose: "Home Renovation",
-    amount: 500000,
-  },
-  {
-    requestId: "LR002",
-    accId: "ACC456",
-    type: "Business",
-    purpose: "Working Capital",
-    amount: 1000000,
-  },
-  {
-    requestId: "LR003",
-    accId: "ACC789",
-    type: "Education",
-    purpose: "Higher Studies",
-    amount: 300000,
-  },
-  {
-    requestId: "LR004",
-    accId: "ACC012",
-    type: "Personal",
-    purpose: "Medical Expenses",
-    amount: 200000,
-  },
-  {
-    requestId: "LR005",
-    accId: "ACC345",
-    type: "Business",
-    purpose: "Equipment Purchase",
-    amount: 750000,
-  },
-];
+enum LoanCommand {
+  APPROVE = "Accept",
+  REJECT = "Reject",
+}
 
-export const columns: ColumnDef<loanRequests>[] = [
+const handleProcess = async (requestId: number, command: LoanCommand) => {
+  try {
+    const message = await processLoanRequest(requestId, command);
+
+    toast({
+      title: "Success",
+      description: message,
+    });
+
+    //reload window
+    window.location.reload();
+  } catch (error) {
+    toast({
+      title: "Error",
+      description:
+        (error as { message?: string })?.message ||
+        "Failed to approve loan request",
+      variant: "destructive",
+    });
+  }
+};
+
+export const columns: ColumnDef<LoanRequest>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -98,7 +87,7 @@ export const columns: ColumnDef<loanRequests>[] = [
     enableHiding: false,
   },
   {
-    accessorKey: "requestId",
+    accessorKey: "id",
     header: ({ column }) => {
       return (
         <Button
@@ -110,22 +99,37 @@ export const columns: ColumnDef<loanRequests>[] = [
         </Button>
       );
     },
-    cell: ({ row }) => <div>{row.getValue("requestId")}</div>,
+    cell: ({ row }) => <div>{row.getValue("id")}</div>,
   },
   {
-    accessorKey: "accId",
+    accessorKey: "customerId",
     header: ({ column }) => {
       return (
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Account ID
+          Customer ID
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
     },
-    cell: ({ row }) => <div>{row.getValue("accId")}</div>,
+    cell: ({ row }) => <div>{row.getValue("customerId")}</div>,
+  },
+  {
+    accessorKey: "employeeId",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Employee ID
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
+    cell: ({ row }) => <div>{row.getValue("employeeId")}</div>,
   },
   {
     accessorKey: "type",
@@ -158,6 +162,21 @@ export const columns: ColumnDef<loanRequests>[] = [
     cell: ({ row }) => <div>{row.getValue("purpose")}</div>,
   },
   {
+    accessorKey: "timePeriod",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Time Period
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
+    cell: ({ row }) => <div>{row.getValue("timePeriod") + " Months"}</div>,
+  },
+  {
     accessorKey: "amount",
     header: () => <div className="text-right">Amount</div>,
     cell: ({ row }) => {
@@ -172,12 +191,27 @@ export const columns: ColumnDef<loanRequests>[] = [
       return <div className="text-right font-medium">{formatted}</div>;
     },
   },
+  {
+    accessorKey: "status",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Status
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
+    cell: ({ row }) => <div>{row.getValue("status")}</div>,
+  },
 
   {
     id: "actions",
     enableHiding: false,
-    cell: () => {
-      return (
+    cell: ({ row }) => {
+      return row.getValue("status") === "Pending" ? (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="h-8 w-8 p-0">
@@ -189,10 +223,23 @@ export const columns: ColumnDef<loanRequests>[] = [
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem>View application</DropdownMenuItem>
-            <DropdownMenuItem>Approve</DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() =>
+                handleProcess(row.getValue("id"), LoanCommand.APPROVE)
+              }
+            >
+              Approve
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() =>
+                handleProcess(row.getValue("id"), LoanCommand.REJECT)
+              }
+            >
+              Reject
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
-      );
+      ) : null;
     },
   },
 ];
@@ -202,9 +249,23 @@ export function LoanRequests() {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
+  const [loanRequests, setLoanRequests] = useState<LoanRequest[]>([]);
+
+  useEffect(() => {
+    const fetchLoanRequests = async () => {
+      try {
+        const loanRequestsList = await listLoanRequests();
+        setLoanRequests(loanRequestsList);
+      } catch (error) {
+        console.error("Error fetching accounts:", error);
+      }
+    };
+
+    fetchLoanRequests();
+  }, []);
 
   const table = useReactTable({
-    data,
+    data: loanRequests,
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -235,14 +296,6 @@ export function LoanRequests() {
       <div className="-mx-4 flex-1 overflow-auto px-4 py-1 lg:flex-row lg:space-x-12 lg:space-y-0">
         <div className="w-full">
           <div className="flex items-center py-4">
-            {/* <Input
-          placeholder="Filter emails..."
-          value={(table.getColumn("email")?.getFilterValue() as string) ?? ""}
-          onChange={(event) =>
-            table.getColumn("email")?.setFilterValue(event.target.value)
-          }
-          className="max-w-sm"
-        /> */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" className="ml-auto">

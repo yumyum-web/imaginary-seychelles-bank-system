@@ -1,10 +1,10 @@
-import { useState } from "react"; // Import useState hook
+import { useEffect, useState } from "react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { cn } from "@/lib/utils";
 import { CaretSortIcon, CheckIcon } from "@radix-ui/react-icons";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/custom/button";
 import { Separator } from "@/components/ui/separator";
 import {
   Form,
@@ -29,70 +29,78 @@ import {
   CommandList,
   CommandEmpty,
 } from "@/components/ui/command";
+import { SavingsAccountPlan } from "@/api/types";
+import { getSavingsAccountPlans } from "@/api/plans";
+import { createSavingsAccount } from "@/api/create";
+import { toast } from "@/hooks/use-toast";
 
-// Updated plans array with the minimum property
-const plans = [
-  { value: "ch", label: "Children", constraint: "12%, no minimum", minimum: 0 },
-  { value: "tn", label: "Teen", constraint: "11%, 500 minimum", minimum: 500 },
-  {
-    value: "ad",
-    label: "Adult(18+)",
-    constraint: "10%, 1000 minimum",
-    minimum: 1000,
-  },
-  {
-    value: "sn",
-    label: "Senior(60+)",
-    constraint: "13%, 1000 minimum",
-    minimum: 1000,
-  },
-] as const;
-
-// Define form schema
-const formSchema = z
-  .object({
-    customer_id: z.string().min(1, { message: "Customer ID is required." }),
-    account_plan: z
-      .string()
-      .min(1, { message: "Please select an account plan." }),
-    initial_deposit: z.preprocess(
-      (value) => parseFloat(value as string),
-      z
-        .number({
-          invalid_type_error: "Initial deposit must be a number.",
-        })
-        .min(0, { message: "Initial deposit must be a positive number." }),
-    ),
-  })
-  .refine(
-    (data) => {
-      const selectedPlan = plans.find(
-        (plan) => plan.value === data.account_plan,
-      );
-      return selectedPlan ? data.initial_deposit >= selectedPlan.minimum : true;
-    },
-    {
-      path: ["initial_deposit"],
-      message:
-        "Initial deposit must meet the minimum requirement for the selected plan.",
-    },
-  );
+const formSchema = z.object({
+  customer_id: z.string().min(1, { message: "Customer ID is required." }),
+  plan_id: z.string().min(1, { message: "Please select an account plan." }),
+  initial_deposit: z.preprocess(
+    (value) => parseFloat(value as string),
+    z
+      .number({
+        invalid_type_error: "Initial deposit must be a number.",
+      })
+      .min(0, { message: "Initial deposit must be a positive number." }),
+  ),
+});
 
 export function CreateSavingsAccount() {
-  const [planDescription, setPlanDescription] = useState(""); // State for plan description
+  const [planDescription, setPlanDescription] = useState("");
+  const [savingsAccPlans, setSavingsAccPlans] = useState<SavingsAccountPlan[]>(
+    [],
+  );
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchSavingsAccountPlans = async () => {
+      try {
+        const plans = await getSavingsAccountPlans();
+        setSavingsAccPlans(plans);
+      } catch (error) {
+        console.error("Error fetching savings account plans:", error);
+      }
+    };
+    fetchSavingsAccountPlans();
+  }, []);
 
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
       customer_id: "",
-      account_plan: "",
-      initial_deposit: "",
+      plan_id: "",
+      initial_deposit: 0,
     },
   });
 
-  // Submit handler
-  function onSubmit() {
-    console.log("Form submitted with data:");
+  async function onSubmit(data: z.infer<typeof formSchema>) {
+    setIsLoading(true);
+    try {
+      const message = await createSavingsAccount(
+        parseInt(data.customer_id),
+        parseInt(data.plan_id),
+        data.initial_deposit,
+      );
+
+      toast({
+        title: "Success",
+        description: message,
+      });
+
+      form.reset();
+    } catch (error) {
+      toast({
+        title: "Error",
+        description:
+          (error as { message?: string })?.message ||
+          "Failed to create checkings account",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   return (
@@ -109,7 +117,6 @@ export function CreateSavingsAccount() {
       <div className="flex flex-1 flex-col space-y-8 md:space-y-2 md:overflow-hidden lg:flex-row lg:space-x-12 lg:space-y-0 md:px-6 lg:px-10">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-            {/* Customer ID Field */}
             <FormField
               control={form.control}
               name="customer_id"
@@ -128,10 +135,9 @@ export function CreateSavingsAccount() {
               )}
             />
 
-            {/* Account Plan Field */}
             <FormField
               control={form.control}
-              name="account_plan"
+              name="plan_id"
               render={({ field }) => (
                 <FormItem className="flex flex-col">
                   <FormLabel>Account Plan</FormLabel>
@@ -142,46 +148,49 @@ export function CreateSavingsAccount() {
                           variant="outline"
                           role="combobox"
                           className={cn(
-                            "w-[200px] justify-between",
+                            " justify-between",
                             !field.value && "text-muted-foreground",
                           )}
                         >
                           {field.value
-                            ? plans.find((plan) => plan.value === field.value)
-                                ?.label
+                            ? savingsAccPlans.find(
+                                (plan) => plan.id === Number(field.value),
+                              )?.name
                             : "Select plan"}
                           <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                         </Button>
                       </FormControl>
                     </PopoverTrigger>
-                    <PopoverContent className="w-[200px] p-0">
+                    <PopoverContent className=" p-0">
                       <Command>
                         <CommandInput placeholder="Search plan..." />
                         <CommandList>
                           <CommandEmpty>No plan found.</CommandEmpty>
                           <CommandGroup heading="Plans">
-                            {plans.map((plan) => (
+                            {savingsAccPlans.map((plan) => (
                               <CommandItem
-                                value={plan.label}
-                                key={plan.value}
+                                value={plan.id.toString()}
+                                key={plan.id}
                                 onSelect={() => {
-                                  form.setValue("account_plan", plan.value);
-                                  setPlanDescription(plan.constraint); // Set plan description
-                                  console.log(
-                                    "Account Plan set to:",
-                                    plan.value,
+                                  form.setValue("plan_id", plan.id.toString()); // Set the plan ID
+                                  setPlanDescription(
+                                    "Minimum balance: LKR." +
+                                      plan.minimumBalance +
+                                      " | Interest Rate: " +
+                                      plan.interestRate * 100 +
+                                      "%",
                                   );
                                 }}
                               >
                                 <CheckIcon
                                   className={cn(
                                     "mr-2 h-4 w-4",
-                                    plan.value === field.value
+                                    plan.id === Number(field.value)
                                       ? "opacity-100"
                                       : "opacity-0",
                                   )}
                                 />
-                                {plan.label}
+                                {plan.name}
                               </CommandItem>
                             ))}
                           </CommandGroup>
@@ -197,14 +206,12 @@ export function CreateSavingsAccount() {
               )}
             />
 
-            {/* Display Selected Plan Description */}
             {planDescription && (
               <div className="text-sm text-gray-600">
                 <strong>Plan Details:</strong> {planDescription}
               </div>
             )}
 
-            {/* Initial Deposit Field */}
             <FormField
               control={form.control}
               name="initial_deposit"
@@ -229,7 +236,9 @@ export function CreateSavingsAccount() {
               )}
             />
 
-            <Button type="submit">Create Account</Button>
+            <Button type="submit" className="mt-2 text-md" loading={isLoading}>
+              {isLoading ? "Creating..." : "Create"}
+            </Button>
           </form>
         </Form>
       </div>
