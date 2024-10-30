@@ -19,8 +19,11 @@ import { CreateFixedDeposit } from "@/pages/employee/createFixedDesposit";
 import { OnlineTransfer } from "@/pages/user/onlineTransfer";
 import { OnlineLoan } from "@/pages/user/onlineLoan";
 import Dashboard from "@/pages/user/dashboard";
+import { Withdraw } from "@/pages/employee/withdraw";
+import { Deposit } from "@/pages/employee/deposit";
 
 const routes: RouteObject[] = [
+  { index: true, element: <SignIn /> },
   { path: "/sign-in", element: <SignIn /> },
   {
     path: "/",
@@ -50,6 +53,8 @@ const routes: RouteObject[] = [
         ),
         children: [
           { index: true, element: <ComingSoon /> },
+          { path: "withdraw", element: <Withdraw /> },
+          { path: "deposit", element: <Deposit /> },
           { path: "create-savings-account", element: <CreateSavingsAccount /> },
           {
             path: "create-checkings-account",
