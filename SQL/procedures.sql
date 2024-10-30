@@ -132,9 +132,9 @@ VALUES
     p_FD_plan_id
   );
 
-@fd_id = LAST_INSERT_ID();
+set @fd_id = LAST_INSERT_ID();
 
-SET @event_name = CONCAT('fd_interest_event_', UUID()); -- Generates a unique event name
+SET @event_name = CONCAT('fd_interest_event_', @fd_id); -- Generates a unique event name
 SET @sql = CONCAT('CREATE EVENT IF NOT EXISTS ', @event_name,
                   ' ON SCHEDULE EVERY 30 DAY DO CALL Add_FD_Interest(', @fd_id, ');');
 PREPARE stmt FROM @sql;
@@ -984,7 +984,7 @@ END;
 
 DELIMITER //
 
-CREATE PROCEDURE Add_FD_Interest(IN p_savings_acc_id INT)
+CREATE PROCEDURE Add_FD_Interest(IN p_FD_id INT)
 BEGIN
   -- Update Savings Account with FD interest for the specified account
   UPDATE Savings_Account SA
@@ -993,7 +993,7 @@ BEGIN
   JOIN FD_plan FDP ON FD.FD_plan_id = FDP.FD_plan_id
   SET A.Balance = A.Balance + (FD.Balance * FDP.Interest_rate / 12)
   WHERE FD.Balance > 0
-    AND SA.Savings_acc_id = p_savings_acc_id;  -- Update only for the specified savings account
+    AND FD.FD_id = p_FD_id;  -- Update only for the specified savings account
 END;
 
 //
