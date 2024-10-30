@@ -1,7 +1,7 @@
 import { Handler } from "openapi-backend";
 import conn from "../../../helpers/db.js";
 import { User } from "../../../models/User.js";
-import { ResultSetHeader } from "mysql2";
+import { QueryError, ResultSetHeader } from "mysql2";
 
 interface CreateSavingsAccountBody {
   customerId: number;
@@ -34,6 +34,17 @@ const createSavingsAccount: Handler<CreateSavingsAccountBody> = async (
       .status(201)
       .json({ message: "Savings account created successfully." });
   } catch (error) {
+    if ((error as QueryError).code === "ER_NO_REFERENCED_ROW_2") {
+      return res.status(400).json({ message: "Invalid customer ID." });
+    } else if (
+      (error as QueryError).message ===
+      "Initial balance does not meet the minimum balance requirement."
+    ) {
+      return res.status(400).json({
+        message:
+          "Initial balance does not meet the minimum balance requirement.",
+      });
+    }
     console.error("Failed to create savings account:", error);
     return res
       .status(500)

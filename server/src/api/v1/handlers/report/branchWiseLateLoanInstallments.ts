@@ -9,12 +9,12 @@ const branchWiseLateLoanInstallmentsReport: Handler = async (c, _, res) => {
   try {
     const query = `
         SELECT Loan_id     AS id,
-               Amount      AS loanAmount,
+               Loan_Amount      AS loanAmount,
                Customer_id AS customerId,
                Type        AS loanType,
                StartDate   AS loanStartDate,
                EndDate     AS loanEndDate,
-               Amount      AS amount,
+               Installment_Amount      AS amount,
                Due_date    AS dueDate
         FROM Late_loan_Installment_report
         WHERE Branch_id = ?;

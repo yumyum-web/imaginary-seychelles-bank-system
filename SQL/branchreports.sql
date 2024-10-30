@@ -16,13 +16,13 @@ FROM
 CREATE VIEW Late_loan_Installment_report AS
 SELECT
   l.Loan_id,
-  l.Amount AS LoanAmount,
+  l.Amount AS Loan_Amount,
   l.Customer_id,
   l.Type,
   l.StartDate,
   l.EndDate,
   ac.Branch_id,
-  li.Amount AS LoanInstallmentAmount,
+  li.Amount AS Installment_Amount,
   li.DATE AS Due_date
 FROM
   Loan l
