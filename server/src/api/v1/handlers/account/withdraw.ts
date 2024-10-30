@@ -34,6 +34,10 @@ const accountWithdraw: Handler<WithdrawBody> = async (c, _, res) => {
       return res
         .status(400)
         .json({ message: "Insufficient balance in the account." });
+    } else if (
+      (error as QueryError).message === "No more withdrawals allowed."
+    ) {
+      return res.status(400).json({ message: "No more withdrawals allowed." });
     }
     console.error("Failed to withdraw:", error);
     return res.status(500).json({ message: "Failed to withdraw." });
