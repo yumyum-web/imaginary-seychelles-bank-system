@@ -9,4 +9,4 @@ FROM
   JOIN Loan_Installments I ON L.Loan_id = I.Loan_id
 WHERE
   I.Activity_id IS NULL
-  AND I.DATE <= ADD_MONTHS (CURDATE(), 1);
+  AND I.DATE <= (CURDATE()+ INTERVAL 1 MONTH);

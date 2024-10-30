@@ -140,7 +140,7 @@ CREATE PROCEDURE Deposit (
   IN D_acc_id INT,
   IN D_amount DECIMAL(10, 2),
   IN D_activity_id INT
-) BEGIN;
+) BEGIN
 
 UPDATE Account
 SET
@@ -216,7 +216,7 @@ CREATE PROCEDURE Withdraw (
   IN W_acc_id INT,
   IN W_activity_id INT,
   IN W_amount DECIMAL(10, 2)
-) BEGIN;
+) BEGIN
 
 DECLARE Max_amount DECIMAL(10, 2);
 
