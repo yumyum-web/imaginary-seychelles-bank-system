@@ -57,7 +57,10 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
         setUser(await getEmployeeProfile());
       } else if (userLevels.includes("user") && userType == "Individual") {
         setUser(await getUserProfile());
-      } else if (userLevels.includes("user") && userType == "Orgnization") {
+      } else if (
+        userLevels.includes("organization") &&
+        userType == "Organization"
+      ) {
         setUser(await getOrganizationProfile());
       }
     };
@@ -82,6 +85,11 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
       navigate("/employee");
     } else if (
       userLevels.includes("user") &&
+      !location.pathname.startsWith("/user")
+    ) {
+      navigate("/user");
+    } else if (
+      userLevels.includes("organization") &&
       !location.pathname.startsWith("/user")
     ) {
       navigate("/user");
