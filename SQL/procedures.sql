@@ -387,9 +387,8 @@ VALUES
 -- Calculate and insert monthly installments
 
 SET
-  v_installment_amount = ROUND(
-    ((p_loan_amount + (p_loan_amount * p_interest_rate)) / v_time_period),
-    2
+  v_installment_amount = CAST(
+    ((p_loan_amount + (p_loan_amount * p_interest_rate)) / v_time_period) AS DECIMAL(10, 2)
   );
 
 WHILE i < v_time_period DO
@@ -965,7 +964,7 @@ WHERE
 
 -- Calculate the interest
 SET
-  interestAmount = currentBalance * interestRate / 100;
+  interestAmount = CAST(currentBalance * interestRate / 100 AS DECIMAL(10, 2));
 
 -- Update the account balance with the new balance
 CALL Deposit (accountId, interestAmount, i_activity_id);
