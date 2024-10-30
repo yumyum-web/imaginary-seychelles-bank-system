@@ -23,8 +23,6 @@
 
 ## API DOC
 
-Here's a comprehensive `README.md` file that incorporates all the details you've shared:
-
 ```markdown
 # Imaginary Seychelles Bank Backend API
 
@@ -66,9 +64,14 @@ This project provides a RESTful API for the Imaginary Seychelles Bank's web-base
    Create a `.env` file in the root directory with the following variables:
 
    ```plaintext
-   DATABASE_URL="your_database_url"
-   JWT_SECRET="your_jwt_secret"
-   PORT=3000
+    DB_HOST=
+    DB_USER=
+    DB_PASSWORD=
+    DB_NAME=
+    DB_PORT=
+
+    JWT_TOKEN_SECRET=
+    JWT_TOKEN_EXPIRES_IN= 
    ```
 
 4. **Run the application**
@@ -83,7 +86,7 @@ To run in development mode with live reload:
 
 ## Usage
 
-After starting the server, the API will be available at `http://localhost:3000`. You can use a tool like [Postman](https://www.postman.com/) or `curl` to test the endpoints.
+After starting the server, the API will be available at `http://localhost:5000`. You can use a tool like [Postman](https://www.postman.com/) or `curl` to test the endpoints.
 
 ## API Documentation
 
@@ -204,21 +207,92 @@ The API follows OpenAPI 3.0 standards, ensuring a structured and well-documented
     - `403 Forbidden`: Access denied.
     - `500 Internal Server Error`: Unable to retrieve accounts.
 
-## Project Structure
+---
+- **List Savings Accounts**
+    - **Method**: `GET`
+    - **Endpoint**: `/account/savings/list`
+    - **Description**: Lists the savings accounts of a customer. Employees can list any customer’s accounts, while customers can list only their own.
+    - **Parameters**:
+    - `customerId` (optional, query): The ID of the customer whose savings accounts are to be retrieved.
+    - **Authorization**: Requires a JWT with either `customer` or `employee` role.
+    - **Responses**:
+    - `200`: Returns a JSON array of savings accounts.
+    - `400`: Bad request due to invalid parameters.
+    - `401`: Unauthorized access (invalid or missing JWT token).
 
-```
-|-- src/
-|   |-- controllers/  # Route logic
-|   |-- models/       # Data models
-|   |-- routes/       # API route definitions
-|   |-- middlewares/  # Middleware functions
-|   |-- utils/        # Utility functions
-|-- tests/            # Test cases
-|-- .env              # Environment variables
-|-- README.md
-|-- tsconfig.json     # TypeScript configuration
-|-- package.json      # Project dependencies and scripts
-```
+---
+
+- **Create a Savings Account**
+    - **Method**: `POST`
+    - **Endpoint**: `/account/savings/create`
+    - **Description**: Creates a new savings account for a specified customer.
+    - **Request Body**:
+    - `customerId` (number, required): The ID of the customer.
+    - `planId` (number, required): The ID of the savings plan.
+    - `initialDeposit` (number, required, float): Initial deposit amount.
+    - **Authorization**: Requires a JWT with `employee` role.
+    - **Responses**:
+    - `201`: Returns a success message upon account creation.
+    - `400`: Bad request due to invalid parameters.
+    - `500`: Server error, indicating account creation failure.
+
+---
+
+- **List Savings Account Plans**
+    - **Method**: `GET`
+    - **Endpoint**: `/account/savings/plans`
+    - **Description**: Lists all available savings account plans.
+    - **Authorization**: Requires a JWT with any `logged-in` role.
+    - **Responses**:
+    - `200`: Returns a JSON array of savings account plans.
+    - `500`: Server error, indicating failure to retrieve plans.
+
+---
+
+- **Branch-wise Total Transactions Report**
+    - **Method**: `GET`
+    - **Endpoint**: `/report/branchWiseTotalTransactions`
+    - **Description**: Retrieves a report of total transactions by branch.
+    - **Authorization**: Requires a JWT with `manager` role.
+    - **Responses**:
+    - `200`: Returns a JSON array with transaction details for each branch.
+    - `500`: Server error, indicating report retrieval failure.
+
+---
+
+- **Branch-wise Late Loan Installments Report**
+    - **Method**: `GET`
+    - **Endpoint**: `/report/branchWiseLateLoanInstallments`
+    - **Description**: Retrieves a report of late loan installments by branch.
+    - **Authorization**: Requires a JWT with `manager` role.
+    - **Responses**:
+    - `200`: Returns a JSON array with details of late installments for each branch.
+    - `500`: Server error, indicating report retrieval failure.
+
+---
+
+### Account Endpoints
+- **Create Checking Account**: `POST /account/checking/create` - Create a new checking account with an initial deposit for a specified customer.
+  
+### Fixed Deposit Endpoints
+- **Create Fixed Deposit**: `POST /fixedDeposit/create` - Create a new fixed deposit account associated with a savings account and deposit plan.
+- **List Fixed Deposits**: `GET /fixedDeposit/list` - Retrieve a list of fixed deposits, optionally filtered by customer ID.
+- **List Fixed Deposit Plans**: `GET /fixedDeposit/plans` - Retrieve a list of available fixed deposit plans.
+
+### Loan Endpoints
+- **Self-Apply for a Loan**: `POST /loan/selfApply` - Customers can apply for a loan directly using their savings and fixed deposit accounts.
+- **Create Loan Request**: `POST /loan/request/create` - Employees can create loan requests on behalf of customers.
+- **Process Loan Request**: `POST /loan/request/process` - Managers can accept or reject loan requests.
+- **Retrieve Loan List**: `GET /loan/list` - Customers can retrieve their loan information.
+- **Get Pending Loan Installments**: `GET /loan/pendingInstallments` - Retrieve details of pending loan installments.
+- **Get Loan Requests**: `GET /loan/request/list` - Retrieve loan requests made by customers or branches.
+
+---
+
+- **Shared Response Components**
+    - **403 Forbidden**: Indicates access is forbidden, with JSON response including `status` and `err` fields.
+    - **401 Unauthorized**: Indicates unauthorized access, with JSON response including `status` and `err` fields.
+    - **400 Bad Request**: Returns a JSON object indicating invalid request parameters or input errors.
 
 ## Security
 
