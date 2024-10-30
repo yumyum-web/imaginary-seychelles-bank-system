@@ -12,14 +12,14 @@ const listLoans: Handler<LoanDetailsRequest> = async (c, _, res) => {
 
   try {
     const query = `
-      SELECT l.Loan_id       AS loan_id,
-             l.Type          AS loan_type,
+      SELECT l.Loan_id       AS loanId,
+             l.Type          AS loanType,
              l.Amount        AS amount,
              l.Purpose       AS purpose,
-             l.Interest_Rate AS interest_rate,
-             l.Request_id    AS request_id,
-             l.StartDate     AS start_date,
-             l.EndDate       AS end_date
+             l.Interest_Rate AS interestRate,
+             l.Request_id    AS requestId,
+             l.StartDate     AS startDate,
+             l.EndDate       AS endDate
       FROM Loan l
              JOIN Account A USING (Acc_id)
       WHERE A.Customer_id = ?

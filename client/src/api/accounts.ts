@@ -61,7 +61,6 @@ export async function listSavingsAccounts(): Promise<SavingsAccount[]> {
 
 /**
  * Fetches the list of fixed deposits, optionally filtered by customer ID.
- * @param customerId - (Optional) ID of the customer to filter deposits.
  * @returns {Promise<FixedDeposit[]>} - Array of fixed deposits.
  */
 export async function listFixedDeposits(): Promise<FixedDeposit[]> {

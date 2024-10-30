@@ -1,8 +1,29 @@
 import api from "./api";
-import { LoanRequest } from "./types";
+import { Loan, LoanRequest, PendingLoanInstallment } from "./types";
 
 function getAuthToken(): string | null {
   return sessionStorage.getItem("token");
+}
+
+/**
+ * Retrieves the loan list for a customer.
+ * @returns {Promise<Loan[]>} - Array of loans for the customer.
+ */
+export async function listLoans(): Promise<Loan[]> {
+  try {
+    const token = getAuthToken();
+    const response = await api.get<Loan[]>("/loan/list", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
+    throw (
+      error.response?.data?.message || new Error("Failed to retrieve loan list")
+    );
+  }
 }
 
 /**
@@ -78,6 +99,33 @@ export async function listLoanRequests(): Promise<LoanRequest[]> {
     throw (
       error.response?.data?.message ||
       new Error("Failed to retrieve loan requests")
+    );
+  }
+}
+
+/**
+ * Retrieves pending loan installments for a customer.
+ * @returns {Promise<PendingInstallment[]>} - Array of pending installments.
+ */
+export async function getPendingLoanInstallments(): Promise<
+  PendingLoanInstallment[]
+> {
+  try {
+    const token = getAuthToken();
+    const response = await api.get<PendingLoanInstallment[]>(
+      "/loan/pendingInstallments",
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
+    return response.data;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
+    throw (
+      error.response?.data?.message ||
+      new Error("Failed to retrieve pending loan installments")
     );
   }
 }

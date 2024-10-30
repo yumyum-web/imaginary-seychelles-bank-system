@@ -55,6 +55,23 @@ export interface BranchWiseLateLoanInstallment {
   dueDate: string;
 }
 
+export interface Loan {
+  loanId: number;
+  loanType: string;
+  amount: number;
+  interestRate: number;
+  purpose: string;
+  requestId?: number;
+  startDate: string;
+  endDate: string;
+}
+
+export interface PendingLoanInstallment {
+  id: number;
+  amount: number;
+  dueDate: string;
+}
+
 export interface LoanRequest {
   id: number;
   employeeId: number;
