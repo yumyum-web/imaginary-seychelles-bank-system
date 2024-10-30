@@ -24,7 +24,11 @@ export function AccountOverview() {
         const checkingAccountsList = await listCheckingAccounts();
         const savingsAccountsList = await listSavingsAccounts();
         setCurrAccountId(
-          savingsAccountsList[0].id || checkingAccountsList[0].id,
+          savingsAccountsList.length > 0
+            ? savingsAccountsList[0].id
+            : checkingAccountsList.length > 0
+              ? checkingAccountsList[0].id
+              : 0,
         );
 
         setCheckingAccounts(checkingAccountsList);

@@ -73,7 +73,7 @@ const routes: RouteObject[] = [
       {
         path: "user",
         element: (
-          <ProtectedRoute requiredLevels={["user"]}>
+          <ProtectedRoute requiredLevels={["user", "organization"]}>
             <Employee />
           </ProtectedRoute>
         ),

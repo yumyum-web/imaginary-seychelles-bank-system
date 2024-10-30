@@ -10,7 +10,6 @@ import {
   DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-// import { useNavigate } from "react-router-dom";
 import { logout } from "@/api/auth";
 import { useUser } from "@/contexts/useUser";
 

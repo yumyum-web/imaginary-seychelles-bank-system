@@ -42,7 +42,10 @@ export default function Sidebar({
     links = [...links, ...managerLinks];
   } else if (userLevels?.includes("employee")) {
     links = [...links, ...employeeLinks];
-  } else if (userLevels?.includes("user")) {
+  } else if (
+    userLevels?.includes("user") ||
+    userLevels?.includes("organization")
+  ) {
     links = [...links, ...userLinks];
   }
 
@@ -62,7 +65,10 @@ export default function Sidebar({
       if ((user as Employee)?.position) {
         setTitle((user as Employee).position);
       }
-    } else if (userLevels?.includes("user")) {
+    } else if (
+      userLevels?.includes("user") ||
+      userLevels?.includes("organization")
+    ) {
       if (user as Individual) {
         setTitle("Customer Dashboard");
       } else if (user as Organization) {
