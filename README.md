@@ -1,6 +1,6 @@
 # Imaginary Seychelles Bank System
 
-## Setting up development environment
+## Setting up the development environment
 
 ### Prerequisites
 
@@ -23,9 +23,6 @@
 
 ## API DOC
 
-```markdown
-# Imaginary Seychelles Bank Backend API
-
 This project provides a RESTful API for the Imaginary Seychelles Bank's web-based system. The API is built using Node.js and TypeScript, with robust endpoints for handling user authentication, account management, and profile information.
 
 ## Table of Contents
@@ -36,7 +33,6 @@ This project provides a RESTful API for the Imaginary Seychelles Bank's web-base
   - [Authentication](#authentication)
   - [User Profile Management](#user-profile-management)
   - [Account Transactions](#account-transactions)
-- [Project Structure](#project-structure)
 - [Security](#security)
 - [License](#license)
 
@@ -296,15 +292,12 @@ The API follows OpenAPI 3.0 standards, ensuring a structured and well-documented
 
 ## Security
 
-The API uses JWT (JSON Web Token) for secure access to endpoints. Role-based security controls ensure that different types of users (customer, employee, organization) have the appropriate access levels.
+The API uses JWT (JSON Web Token) to secure endpoint access. Role-based security controls ensure that different types of users (customer, employee, organization) have the appropriate access levels.
 
 ## License
 
-This project is licensed under the MIT License.
+This project is licensed under the GPLv3 License.
 
 ---
 
 For further questions, please refer to the API documentation or reach out to the maintainers.
-```
-
-This `README.md` covers all aspects of the API and is ready to include in your repository. Let me know if there’s anything more specific you'd like to add.
