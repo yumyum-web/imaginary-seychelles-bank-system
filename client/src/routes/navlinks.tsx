@@ -11,6 +11,8 @@ import {
   IconHeartHandshake,
   IconCreditCardPay,
   IconBuildingBank,
+  IconArrowsTransferDown,
+  IconArrowsTransferUp,
 } from "@tabler/icons-react";
 
 export interface NavLink {
@@ -67,6 +69,18 @@ export const employeeLinks = [
     label: "",
     href: "/employee",
     icon: <IconLayoutDashboard size={18} />,
+  },
+  {
+    title: "Withdraw",
+    label: "",
+    href: "/employee/withdraw",
+    icon: <IconArrowsTransferDown size={18} />,
+  },
+  {
+    title: "Deposit",
+    label: "",
+    href: "/employee/deposit",
+    icon: <IconArrowsTransferUp size={18} />,
   },
   {
     title: "Open Accounts",

@@ -1,5 +1,7 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AccountOverview } from "./components/accountOverview";
+import { LoanOverview } from "./components/loanOverview";
+import { FDOverview } from "./components/fdOverview";
 
 export default function Dashboard() {
   return (
@@ -15,15 +17,18 @@ export default function Dashboard() {
         <div className="w-full overflow-x-auto pb-2">
           <TabsList>
             <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="transactions">Transactions</TabsTrigger>
-            <TabsTrigger value="loans">Loan Installments</TabsTrigger>
+            <TabsTrigger value="fd">Fixed Deposits</TabsTrigger>
+            <TabsTrigger value="loans">Loans</TabsTrigger>
           </TabsList>
         </div>
         <TabsContent value="overview" className="space-y-4">
           <AccountOverview />
         </TabsContent>
-        <TabsContent value="transactions" className="space-y-4">
-          {/* <TransactionHistory /> */}
+        <TabsContent value="fd" className="space-y-4">
+          <FDOverview />
+        </TabsContent>
+        <TabsContent value="loans" className="space-y-4">
+          <LoanOverview />
         </TabsContent>
       </Tabs>
     </>
