@@ -56,6 +56,15 @@ INSERT INTO
 VALUES
   (@acc_id, p_SA_plan_id, 0);
 
+set @savings_acc_id = LAST_INSERT_ID();
+
+SET @event_name = CONCAT('sa_interest_event_', @sa_acc_id); -- Generates a unique event name
+SET @sql = CONCAT('CREATE EVENT IF NOT EXISTS ', @event_name,
+                  ' ON SCHEDULE EVERY 30 DAY DO CALL Add_Savings_Interest(', @savings_acc_id, ');');
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
 END;
 
 / / DELIMITER / /
@@ -132,9 +141,9 @@ VALUES
     p_FD_plan_id
   );
 
-@fd_id = LAST_INSERT_ID();
+set @fd_id = LAST_INSERT_ID();
 
-SET @event_name = CONCAT('fd_interest_event_', UUID()); -- Generates a unique event name
+SET @event_name = CONCAT('fd_interest_event_', @fd_id); -- Generates a unique event name
 SET @sql = CONCAT('CREATE EVENT IF NOT EXISTS ', @event_name,
                   ' ON SCHEDULE EVERY 30 DAY DO CALL Add_FD_Interest(', @fd_id, ');');
 PREPARE stmt FROM @sql;
@@ -672,7 +681,7 @@ END IF;
 
 -- Calculate the maximum loan amount
 SET
-  v_max_loan_amount = Max_amount_Self_Apply_Loan (p_customer_id);
+  v_max_loan_amount = Max_amount_Self_Apply_Loan (p_FD_id);
 
 -- Check if the requested amount is within the allowed limit
 IF p_amount > v_max_loan_amount THEN SIGNAL SQLSTATE '45000'
@@ -955,36 +964,23 @@ COMMIT;
 END;
 
 / / delimiter / /
-CREATE PROCEDURE AddInterest (
-  IN accountId INT,
-  IN interestRate DECIMAL(5, 2),
-  IN i_activity_id INT
-) BEGIN DECLARE currentBalance DECIMAL(10, 2);
-
-DECLARE interestAmount DECIMAL(10, 2);
-
--- Get the current balance of the account
-SELECT
-  balance INTO currentBalance
-FROM
-  Account
-WHERE
-  Acc_id = accountId;
-
--- Calculate the interest
-SET
-  interestAmount = CAST((currentBalance * interestRate / 100) AS DECIMAL(10, 2));
-
--- Update the account balance with the new balance
-CALL Deposit (accountId, interestAmount, i_activity_id);
-
+CREATE PROCEDURE Add_Savings_Interest (
+  IN p_Savings_acc_id INT
+) BEGIN
+    -- Update Savings Account with FD interest for the specified account
+    UPDATE Savings_Account SA
+        JOIN Account A ON SA.Acc_id = A.Acc_id
+        JOIN SA_plan SAP ON SA.SA_plan_id = SAP.SA_plan_id
+    SET A.Balance = A.Balance + (A.Balance * SAP.Interest_rate / 12)
+    WHERE A.Balance > 0
+      AND SA.Savings_acc_id = p_Savings_acc_id; -- Update only for the specified savings account
 END;
 
 //
 
 DELIMITER //
 
-CREATE PROCEDURE Add_FD_Interest(IN p_savings_acc_id INT)
+CREATE PROCEDURE Add_FD_Interest(IN p_FD_id INT)
 BEGIN
   -- Update Savings Account with FD interest for the specified account
   UPDATE Savings_Account SA
@@ -993,7 +989,7 @@ BEGIN
   JOIN FD_plan FDP ON FD.FD_plan_id = FDP.FD_plan_id
   SET A.Balance = A.Balance + (FD.Balance * FDP.Interest_rate / 12)
   WHERE FD.Balance > 0
-    AND SA.Savings_acc_id = p_savings_acc_id;  -- Update only for the specified savings account
+    AND FD.FD_id = p_FD_id;  -- Update only for the specified savings account
 END;
 
 //
