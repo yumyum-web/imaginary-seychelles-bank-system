@@ -681,7 +681,7 @@ END IF;
 
 -- Calculate the maximum loan amount
 SET
-  v_max_loan_amount = Max_amount_Self_Apply_Loan (p_customer_id);
+  v_max_loan_amount = Max_amount_Self_Apply_Loan (p_FD_id);
 
 -- Check if the requested amount is within the allowed limit
 IF p_amount > v_max_loan_amount THEN SIGNAL SQLSTATE '45000'
