@@ -189,7 +189,7 @@ END;
 
 / / delimiter / /
 -- Available_Withdrawals: Returns the number of withdrawals that can be made from an account.
-CREATE FUNCTION Available_Withdrawals (Acc_id INT) RETURNS INT DETERMINISTIC BEGIN;
+CREATE FUNCTION Available_Withdrawals (Acc_id INT) RETURNS INT DETERMINISTIC BEGIN
 
 DECLARE v_No_of_withdrawals INT;
 
@@ -216,11 +216,19 @@ CREATE PROCEDURE Withdraw (
   IN W_acc_id INT,
   IN W_activity_id INT,
   IN W_amount DECIMAL(10, 2)
-) BEGIN;
+) BEGIN
 
 DECLARE Max_amount DECIMAL(10, 2);
 
 DECLARE Available_withdrawals INT;
+
+DECLARE EXIT HANDLER FOR SQLEXCEPTION BEGIN
+    ROLLBACK;
+    RESIGNAL ;
+
+END;
+
+START TRANSACTION;
 
 SET
   Max_amount = Max_Withdraw_Amount (W_acc_id);
@@ -246,10 +254,18 @@ SET
 WHERE
   Account.Acc_id = W_acc_id;
 
+UPDATE Savings_Account
+SET
+  No_of_withdrawals = No_of_withdrawals + 1
+WHERE
+  Savings_Account.Acc_id = W_acc_id;
+
 INSERT INTO
   Transaction (Acc_id, Activity_id, Type)
 VALUES
   (W_acc_id, W_activity_id, 'Withdrawal');
+
+COMMIT;
 
 END;
 
@@ -371,9 +387,8 @@ VALUES
 -- Calculate and insert monthly installments
 
 SET
-  v_installment_amount = ROUND(
-    ((p_loan_amount + (p_loan_amount * p_interest_rate)) / v_time_period),
-    2
+  v_installment_amount = CAST(
+    ((p_loan_amount + (p_loan_amount * p_interest_rate)) / v_time_period) AS DECIMAL(10, 2)
   );
 
 WHILE i < v_time_period DO
@@ -949,7 +964,7 @@ WHERE
 
 -- Calculate the interest
 SET
-  interestAmount = currentBalance * interestRate / 100;
+  interestAmount = CAST(currentBalance * interestRate / 100 AS DECIMAL(10, 2));
 
 -- Update the account balance with the new balance
 CALL Deposit (accountId, interestAmount, i_activity_id);
