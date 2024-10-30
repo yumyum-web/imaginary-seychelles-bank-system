@@ -956,4 +956,21 @@ CALL Deposit (accountId, interestAmount, i_activity_id);
 
 END;
 
-/ /
+//
+
+DELIMITER //
+
+CREATE PROCEDURE Add_FD_Interest(IN savings_acc_id INT)
+BEGIN
+  -- Update Savings Account with FD interest for the specified account
+  UPDATE Savings_Account SA
+  JOIN Fixed_deposit FD ON SA.Savings_acc_id = FD.Savings_acc_id
+  SET SA.Balance = SA.Balance + (FD.Balance * FD.Interest_rate / 12)
+  WHERE FD.Balance > 0 
+    AND SA.Savings_acc_id = savings_acc_id;  -- Update only for the specified savings account
+END;
+
+//
+
+
+
